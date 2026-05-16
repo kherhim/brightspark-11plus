@@ -1,0 +1,129 @@
+// The adaptive engine: per-topic difficulty ladder, EWMA mastery, and
+// weighted topic selection. All tunable knobs live here as named
+// constants so a non-expert can adjust the feel in one place.
+
+import { TOPICS, MAX_LEVEL, MIN_LEVEL } from "./topics.js";
+import { ensureTopic } from "./store.js";
+
+// --- Tunable constants ----------------------------------------------------
+export const PROMOTE_THRESHOLD = 2; // correct-in-a-row to go up a level
+export const DEMOTE_THRESHOLD = 2; // wrong-in-a-row to drop a level
+export const ALPHA = 0.25; // EWMA learning rate for mastery
+export const MASTERY_MIN = 0.85; // mastery score needed to be "mastered"
+export const MASTERY_LEVEL = 5; // and you must be at least this level
+export const MASTERY_MIN_ATTEMPTS = 12; // and have answered at least this many
+export const SPACING_MS = 1000 * 60 * 20; // "seen recently" window (20 min)
+export const W_WEAKNESS = 0.55;
+export const W_RECENCY = 0.3;
+export const W_COVERAGE = 0.15;
+export const MASTERED_PENALTY = 0.25; // mastered topics still recur, but rarely
+export const WEIGHT_FLOOR = 0.03; // every topic always has a chance
+export const MAX_RECENT_MISTAKES = 10;
+
+export function levelFactor(level) {
+  return 0.6 + (0.4 * level) / MAX_LEVEL;
+}
+
+export function isMastered(ts) {
+  return (
+    ts.level >= MASTERY_LEVEL &&
+    ts.mastery >= MASTERY_MIN &&
+    ts.attempts >= MASTERY_MIN_ATTEMPTS
+  );
+}
+
+// Record a *graded* answer and advance the ladder. Mutates and returns the
+// topic state. `info.level` is the level the question was presented at.
+export function recordResult(state, topicId, info) {
+  const ts = ensureTopic(state, topicId);
+  const correct = !!info.correct;
+
+  ts.attempts += 1;
+  ts.seenCount += 1;
+  ts.lastSeenAt = Date.now();
+  ts.timeMs += Math.max(0, info.timeMs || 0);
+  state.global.totalAnswered += 1;
+  state.lastTopicId = topicId;
+
+  if (correct) {
+    ts.correct += 1;
+    ts.streakCorrect += 1;
+    ts.streakWrong = 0;
+    state.global.totalCorrect += 1;
+  } else {
+    ts.streakWrong += 1;
+    ts.streakCorrect = 0;
+    ts.recentMistakes.push({
+      qid: info.qid,
+      level: info.level,
+      chosenKey: info.chosenKey ?? null,
+      chosenText: info.chosenText ?? null,
+      correctText: info.correctText ?? null,
+      misconceptionId: info.misconceptionId ?? null,
+      at: Date.now(),
+    });
+    if (ts.recentMistakes.length > MAX_RECENT_MISTAKES) {
+      ts.recentMistakes.shift();
+    }
+  }
+
+  // EWMA mastery, weighted by the level the answer was earned at.
+  const target = correct ? levelFactor(info.level) : 0;
+  ts.mastery = (1 - ALPHA) * ts.mastery + ALPHA * target;
+
+  // Ladder.
+  if (correct && ts.streakCorrect >= PROMOTE_THRESHOLD && ts.level < MAX_LEVEL) {
+    ts.level += 1;
+    ts.streakCorrect = 0;
+    ts.streakWrong = 0;
+  } else if (
+    !correct &&
+    ts.streakWrong >= DEMOTE_THRESHOLD &&
+    ts.level > MIN_LEVEL
+  ) {
+    ts.level -= 1;
+    ts.streakCorrect = 0;
+    ts.streakWrong = 0;
+  }
+
+  ts.mastered = isMastered(ts);
+  return ts;
+}
+
+// Relative selection weight for one topic (exposed for the dashboard too).
+export function topicWeight(state, topicId, now = Date.now()) {
+  const ts = ensureTopic(state, topicId);
+  const weakness = 1 - ts.mastery;
+  const gap = ts.lastSeenAt
+    ? Math.min(1, (now - ts.lastSeenAt) / SPACING_MS)
+    : 1;
+  const coverage = 1 / Math.sqrt(ts.seenCount + 1);
+  const penalty = ts.mastered ? MASTERED_PENALTY : 1;
+  const w =
+    (W_WEAKNESS * weakness + W_RECENCY * gap + W_COVERAGE * coverage) * penalty;
+  return Math.max(WEIGHT_FLOOR, w);
+}
+
+// Choose the next topic by weighted random. Avoids immediately repeating
+// the previous topic unless it is the only sensible choice.
+export function selectTopic(state, rng, now = Date.now()) {
+  const ids = TOPICS.map((t) => t.id);
+  let pool = ids;
+  if (state.lastTopicId && ids.length > 1) {
+    const filtered = ids.filter((id) => id !== state.lastTopicId);
+    if (filtered.length) pool = filtered;
+  }
+  const weights = pool.map((id) => topicWeight(state, id, now));
+  const total = weights.reduce((s, w) => s + w, 0);
+  let r = rng.float() * total;
+  for (let i = 0; i < pool.length; i++) {
+    r -= weights[i];
+    if (r <= 0) return pool[i];
+  }
+  return pool[pool.length - 1];
+}
+
+// Level a topic's next question should be presented at.
+export function presentationLevel(state, topicId) {
+  return ensureTopic(state, topicId).level;
+}

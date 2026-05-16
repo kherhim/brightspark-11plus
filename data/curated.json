@@ -1,0 +1,556 @@
+[
+  {
+    "id": "cur-001", "topicId": "ratio", "level": 5, "type": "numeric",
+    "promptHTML": "Apples and oranges are in the ratio 3 : 5. There are 24 apples. How many pieces of fruit are there altogether?",
+    "answer": { "value": 64, "tolerance": 0, "accept": ["64"] },
+    "explanation": "Find the value of one ratio part from the apples, then total all the parts.",
+    "workedSteps": ["1 part = 24 ÷ 3 = 8", "Oranges = 5 × 8 = 40", "Total = 24 + 40 = 64"],
+    "keyConcept": "Use a known share to find one part, then build the total."
+  },
+  {
+    "id": "cur-002", "topicId": "ratio", "level": 6, "type": "numeric",
+    "promptHTML": "Money is shared between Amy, Ben and Cara in the ratio 2 : 3 : 5. Cara gets £45 more than Amy. How much money was shared in total?",
+    "answer": { "value": 150, "tolerance": 0, "accept": ["150", "£150"] },
+    "explanation": "Cara − Amy = 5 − 2 = 3 parts, and that equals £45, so one part = £15.",
+    "workedSteps": ["3 parts = £45 → 1 part = £15", "Total parts = 2+3+5 = 10", "10 × £15 = £150"],
+    "keyConcept": "A difference in shares is a difference in parts."
+  },
+  {
+    "id": "cur-003", "topicId": "fractions", "level": 5, "type": "numeric",
+    "promptHTML": "Syon spends 1/3 of his money on a book and 1/4 of what is left on a snack. He started with £24. How much money (£) does he have left?",
+    "answer": { "value": 12, "tolerance": 0, "accept": ["12", "£12"] },
+    "explanation": "Work step by step: take the book cost off first, then a quarter of the remainder.",
+    "workedSteps": ["Book: 1/3 of £24 = £8 → £16 left", "Snack: 1/4 of £16 = £4 → £12 left"],
+    "keyConcept": "‘Of what is left’ means use the new amount, not the original."
+  },
+  {
+    "id": "cur-004", "topicId": "fractions", "level": 6, "type": "numeric",
+    "promptHTML": "After giving away 2/5 of her stickers, Mia has 36 left. How many stickers did she start with?",
+    "answer": { "value": 60, "tolerance": 0, "accept": ["60"] },
+    "explanation": "36 represents the fraction she kept (3/5). Find one fifth, then the whole.",
+    "workedSteps": ["Kept = 1 − 2/5 = 3/5", "3/5 = 36 → 1/5 = 12", "Whole = 5 × 12 = 60"],
+    "keyConcept": "Reverse a fraction problem by finding the value of one part."
+  },
+  {
+    "id": "cur-005", "topicId": "percentages", "level": 6, "type": "numeric",
+    "promptHTML": "A coat costs £80. In a sale it is reduced by 25%. The next week another 10% is taken off the sale price. What is the final price (£)?",
+    "answer": { "value": 54, "tolerance": 0.001, "accept": ["54", "£54", "54.00"] },
+    "explanation": "Apply the discounts one after the other to the running price.",
+    "workedSteps": ["25% off £80 = £60", "10% off £60 = £54"],
+    "keyConcept": "Successive percentage changes are applied one at a time, not added."
+  },
+  {
+    "id": "cur-006", "topicId": "percentages", "level": 5, "type": "mcq",
+    "promptHTML": "In a class of 30, 60% are girls. How many boys are there?",
+    "choices": [
+      { "text": "12", "correct": true },
+      { "text": "18", "correct": false, "misconceptionId": "girls_not_boys" },
+      { "text": "60", "correct": false, "misconceptionId": "used_percent" },
+      { "text": "20", "correct": false, "misconceptionId": "wrong_base" }
+    ],
+    "misconceptions": {
+      "girls_not_boys": "That is the number of girls. The question asks for boys.",
+      "used_percent": "60 is the percentage, not a number of children.",
+      "wrong_base": "Take 60% of 30, then subtract from 30."
+    },
+    "explanation": "Find the girls (60% of 30), then subtract from the total to get the boys.",
+    "workedSteps": ["Girls = 60% of 30 = 18", "Boys = 30 − 18 = 12"],
+    "keyConcept": "Percentage of a group, then use the total to find the rest."
+  },
+  {
+    "id": "cur-007", "topicId": "add-subtract", "level": 4, "type": "numeric",
+    "promptHTML": "A coach holds 52 people. 3 full coaches and 1 coach with 28 people travel to a match. How many people travelled in total?",
+    "answer": { "value": 184, "tolerance": 0, "accept": ["184"] },
+    "explanation": "Multiply for the full coaches, then add the part-full one.",
+    "workedSteps": ["3 × 52 = 156", "156 + 28 = 184"],
+    "keyConcept": "Break a problem into a 'times' part and an 'add' part."
+  },
+  {
+    "id": "cur-008", "topicId": "multiply-divide", "level": 5, "type": "numeric",
+    "promptHTML": "Pencils come in boxes of 12. A school needs 400 pencils. How many full boxes must it buy?",
+    "answer": { "value": 34, "tolerance": 0, "accept": ["34"] },
+    "explanation": "400 ÷ 12 = 33 remainder 4. They need a 34th box for the extra 4 pencils.",
+    "workedSteps": ["400 ÷ 12 = 33 r 4", "Round up: 34 boxes"],
+    "keyConcept": "Real-life division often rounds up: you can't buy part of a box."
+  },
+  {
+    "id": "cur-009", "topicId": "multiply-divide", "level": 4, "type": "mcq",
+    "promptHTML": "Eggs are packed 6 to a box. A farmer collects 80 eggs. How many eggs are left over after filling whole boxes?",
+    "choices": [
+      { "text": "2", "correct": true },
+      { "text": "13", "correct": false, "misconceptionId": "gave_boxes" },
+      { "text": "4", "correct": false, "misconceptionId": "wrong_rem" },
+      { "text": "0", "correct": false, "misconceptionId": "assumed_exact" }
+    ],
+    "misconceptions": {
+      "gave_boxes": "13 is the number of full boxes, not the leftover eggs.",
+      "wrong_rem": "Recheck: 13 × 6 = 78, so 80 − 78 = 2.",
+      "assumed_exact": "80 does not divide exactly by 6 — there is a remainder."
+    },
+    "explanation": "Divide and look at the remainder, which is the eggs left over.",
+    "workedSteps": ["80 ÷ 6 = 13 remainder 2", "Leftover = 2"],
+    "keyConcept": "The remainder answers 'how many left over'."
+  },
+  {
+    "id": "cur-010", "topicId": "measurement", "level": 5, "type": "numeric",
+    "promptHTML": "A film starts at 18:45 and lasts 2 hours 35 minutes. At what time (24-hour, hhmm) does it end? Give the answer as a 4-digit number, e.g. 2120.",
+    "answer": { "value": 2120, "tolerance": 0, "accept": ["2120", "21:20"] },
+    "explanation": "Add the hours, then the minutes, carrying 60 minutes into an hour.",
+    "workedSteps": ["18:45 + 2h = 20:45", "20:45 + 35 min = 21:20"],
+    "keyConcept": "Add time in stages; 60 minutes makes an hour."
+  },
+  {
+    "id": "cur-011", "topicId": "measurement", "level": 4, "type": "numeric",
+    "promptHTML": "A jug holds 2.5 litres. How many 200 ml glasses can be filled completely from a full jug?",
+    "answer": { "value": 12, "tolerance": 0, "accept": ["12"] },
+    "explanation": "Convert litres to ml, then divide by the glass size.",
+    "workedSteps": ["2.5 L = 2500 ml", "2500 ÷ 200 = 12.5 → 12 full glasses"],
+    "keyConcept": "Convert to the same unit, then divide (round down for 'complete')."
+  },
+  {
+    "id": "cur-012", "topicId": "pav", "level": 5, "type": "numeric",
+    "promptHTML": "A rectangular garden is 12 m long and 8 m wide. A path 1 m wide runs all the way around the inside edge. What area (m²) is left for grass?",
+    "answer": { "value": 60, "tolerance": 0, "accept": ["60"] },
+    "explanation": "The inner grass rectangle loses 1 m on every side, so 2 m off each dimension.",
+    "workedSteps": ["Inner = (12−2) × (8−2) = 10 × 6", "Area = 60 m²"],
+    "keyConcept": "A border reduces each dimension by twice its width."
+  },
+  {
+    "id": "cur-013", "topicId": "pav", "level": 6, "type": "numeric",
+    "promptHTML": "A cube has a volume of 64 cm³. What is the total length (cm) of all its edges?",
+    "answer": { "value": 48, "tolerance": 0, "accept": ["48"] },
+    "explanation": "Cube root the volume for the side, then a cube has 12 equal edges.",
+    "workedSteps": ["Side = ∛64 = 4 cm", "12 edges × 4 = 48 cm"],
+    "keyConcept": "A cube has 12 edges; volume = side³."
+  },
+  {
+    "id": "cur-014", "topicId": "algebra", "level": 6, "type": "numeric",
+    "promptHTML": "I think of a number, multiply it by 4 and subtract 7. The answer is 25. What was my number?",
+    "answer": { "value": 8, "tolerance": 0, "accept": ["8"] },
+    "explanation": "Undo the steps backwards: add 7, then divide by 4.",
+    "workedSteps": ["25 + 7 = 32", "32 ÷ 4 = 8"],
+    "keyConcept": "Solve 'think of a number' by reversing each operation."
+  },
+  {
+    "id": "cur-015", "topicId": "algebra", "level": 5, "type": "mcq",
+    "promptHTML": "The nth term of a sequence is 3n + 2. Which of these numbers is in the sequence?",
+    "choices": [
+      { "text": "20", "correct": true },
+      { "text": "21", "correct": false, "misconceptionId": "not_in_seq" },
+      { "text": "15", "correct": false, "misconceptionId": "not_in_seq2" },
+      { "text": "10", "correct": false, "misconceptionId": "not_in_seq3" }
+    ],
+    "misconceptions": {
+      "not_in_seq": "21 − 2 = 19, which is not a multiple of 3.",
+      "not_in_seq2": "15 − 2 = 13, not a multiple of 3.",
+      "not_in_seq3": "10 − 2 = 8, not a multiple of 3."
+    },
+    "explanation": "A term works if (term − 2) is a positive multiple of 3.",
+    "workedSteps": ["20 − 2 = 18", "18 ÷ 3 = 6 (n = 6, a whole number) ✓"],
+    "keyConcept": "Test membership by reversing the nth-term rule."
+  },
+  {
+    "id": "cur-016", "topicId": "statistics", "level": 6, "type": "numeric",
+    "promptHTML": "The mean of five numbers is 14. Four of the numbers are 10, 12, 16 and 18. What is the fifth number?",
+    "answer": { "value": 14, "tolerance": 0, "accept": ["14"] },
+    "explanation": "Total = mean × count. Subtract the four known numbers.",
+    "workedSteps": ["Total = 14 × 5 = 70", "70 − (10+12+16+18) = 70 − 56 = 14"],
+    "keyConcept": "Mean problems hinge on the total = mean × count."
+  },
+  {
+    "id": "cur-017", "topicId": "statistics", "level": 5, "type": "numeric",
+    "promptHTML": "Syon's test scores are 7, 9, 8, 6 and 10. He takes a sixth test. What must he score so his mean is exactly 8?",
+    "answer": { "value": 8, "tolerance": 0, "accept": ["8"] },
+    "explanation": "A mean of 8 over 6 tests needs a total of 48. Subtract the first five.",
+    "workedSteps": ["Needed total = 8 × 6 = 48", "First five total = 40", "48 − 40 = 8"],
+    "keyConcept": "Target a mean by working from the required total."
+  },
+  {
+    "id": "cur-018", "topicId": "place-value", "level": 5, "type": "mcq",
+    "promptHTML": "What is the value of the digit 7 in the number 4 705 132?",
+    "choices": [
+      { "text": "700 000", "correct": true },
+      { "text": "7000", "correct": false, "misconceptionId": "wrong_col" },
+      { "text": "7", "correct": false, "misconceptionId": "digit_only" },
+      { "text": "70 000", "correct": false, "misconceptionId": "off_one" }
+    ],
+    "misconceptions": {
+      "wrong_col": "Count the columns again — the 7 is in the hundred-thousands place.",
+      "digit_only": "That is just the digit; multiply by its place value.",
+      "off_one": "It is hundred-thousands (700 000), not ten-thousands."
+    },
+    "explanation": "From the right: units, tens, hundreds, thousands, ten-thousands, hundred-thousands.",
+    "workedSteps": ["7 is in the hundred-thousands column", "7 × 100 000 = 700 000"],
+    "keyConcept": "Digit value = digit × its place value."
+  },
+  {
+    "id": "cur-019", "topicId": "decimals", "level": 5, "type": "numeric",
+    "promptHTML": "A piece of ribbon 4.5 m long is cut into 6 equal pieces. How long (m) is each piece?",
+    "answer": { "value": 0.75, "tolerance": 0.001, "accept": ["0.75"] },
+    "explanation": "Divide the total length by the number of pieces.",
+    "workedSteps": ["4.5 ÷ 6 = 0.75 m"],
+    "keyConcept": "Sharing a length equally is a division."
+  },
+  {
+    "id": "cur-020", "topicId": "decimals", "level": 6, "type": "numeric",
+    "promptHTML": "Petrol costs £1.45 per litre. How much (£) does it cost to buy 8 litres?",
+    "answer": { "value": 11.6, "tolerance": 0.005, "accept": ["11.60", "11.6", "£11.60"] },
+    "explanation": "Multiply the price per litre by the number of litres.",
+    "workedSteps": ["1.45 × 8 = 11.60", "Cost = £11.60"],
+    "keyConcept": "Rate × quantity gives the total cost."
+  },
+  {
+    "id": "cur-021", "topicId": "add-subtract", "level": 5, "type": "numeric",
+    "promptHTML": "A magic square uses the numbers 1–9 so every row, column and diagonal adds to the same total. What is that total?",
+    "answer": { "value": 15, "tolerance": 0, "accept": ["15"] },
+    "explanation": "1+2+…+9 = 45, shared equally over 3 rows.",
+    "workedSteps": ["Sum 1–9 = 45", "45 ÷ 3 rows = 15"],
+    "keyConcept": "Use the grand total to find a shared row total."
+  },
+  {
+    "id": "cur-022", "topicId": "ratio", "level": 4, "type": "numeric",
+    "promptHTML": "A recipe uses flour and sugar in the ratio 5 : 2. If 10 cups of flour are used, how many cups of sugar are needed?",
+    "answer": { "value": 4, "tolerance": 0, "accept": ["4"] },
+    "explanation": "Find the multiplier from the flour, then scale the sugar.",
+    "workedSteps": ["10 ÷ 5 = 2", "Sugar = 2 × 2 = 4 cups"],
+    "keyConcept": "Scale both parts of a ratio by the same factor."
+  },
+  {
+    "id": "cur-023", "topicId": "fractions", "level": 4, "type": "mcq",
+    "promptHTML": "Which is greater: 2/3 or 3/5?",
+    "choices": [
+      { "text": "2/3", "correct": true },
+      { "text": "3/5", "correct": false, "misconceptionId": "bigger_digits" },
+      { "text": "They are equal", "correct": false, "misconceptionId": "thought_equal" },
+      { "text": "Cannot tell", "correct": false, "misconceptionId": "cant_tell" }
+    ],
+    "misconceptions": {
+      "bigger_digits": "Bigger numbers don't mean a bigger fraction — use a common denominator.",
+      "thought_equal": "10/15 vs 9/15 — they are not equal.",
+      "cant_tell": "You can always compare using a common denominator."
+    },
+    "explanation": "Use a common denominator of 15: 2/3 = 10/15 and 3/5 = 9/15.",
+    "workedSteps": ["2/3 = 10/15", "3/5 = 9/15", "10/15 > 9/15"],
+    "keyConcept": "Compare fractions with a common denominator."
+  },
+  {
+    "id": "cur-024", "topicId": "geometry", "level": 5, "type": "numeric",
+    "promptHTML": "An isosceles triangle has a top angle of 40°. What is the size (degrees) of each equal base angle?",
+    "answer": { "value": 70, "tolerance": 0, "accept": ["70", "70°"] },
+    "explanation": "The two base angles are equal and the three angles total 180°.",
+    "workedSteps": ["180 − 40 = 140", "140 ÷ 2 = 70°"],
+    "keyConcept": "Isosceles triangles have two equal angles; all three total 180°."
+  },
+  {
+    "id": "cur-025", "topicId": "geometry", "level": 6, "type": "numeric",
+    "promptHTML": "The interior angles of a regular hexagon are all equal. What is the size (degrees) of each one?",
+    "answer": { "value": 120, "tolerance": 0, "accept": ["120", "120°"] },
+    "explanation": "Interior angle sum of an n-gon = (n − 2) × 180°. Divide by n for a regular shape.",
+    "workedSteps": ["(6 − 2) × 180 = 720°", "720 ÷ 6 = 120°"],
+    "keyConcept": "Regular polygon interior angle = (n−2)×180 ÷ n."
+  },
+  {
+    "id": "cur-026", "topicId": "percentages", "level": 6, "type": "numeric",
+    "promptHTML": "A jacket is sold for £63 after a 10% discount. What was its original price (£)?",
+    "answer": { "value": 70, "tolerance": 0.01, "accept": ["70", "£70"] },
+    "explanation": "£63 is 90% of the original. Divide by 0.9 (or find 1% then 100%).",
+    "workedSteps": ["90% = £63", "1% = £0.70", "100% = £70"],
+    "keyConcept": "Reverse percentage: divide by the multiplier, don't add the % back."
+  },
+  {
+    "id": "cur-027", "topicId": "multiply-divide", "level": 6, "type": "numeric",
+    "promptHTML": "A tap drips once every 3 seconds. How many drips is that in one hour?",
+    "answer": { "value": 1200, "tolerance": 0, "accept": ["1200"] },
+    "explanation": "Find the seconds in an hour, then divide by 3.",
+    "workedSteps": ["1 hour = 3600 s", "3600 ÷ 3 = 1200 drips"],
+    "keyConcept": "Convert to the same unit (seconds) before dividing."
+  },
+  {
+    "id": "cur-028", "topicId": "add-subtract", "level": 6, "type": "numeric",
+    "promptHTML": "The sum of three consecutive whole numbers is 72. What is the largest of the three numbers?",
+    "answer": { "value": 25, "tolerance": 0, "accept": ["25"] },
+    "explanation": "The middle number is the mean: 72 ÷ 3 = 24. The numbers are 23, 24, 25.",
+    "workedSteps": ["72 ÷ 3 = 24 (middle)", "Numbers: 23, 24, 25", "Largest = 25"],
+    "keyConcept": "For consecutive numbers, the middle one is the mean."
+  },
+  {
+    "id": "cur-029", "topicId": "algebra", "level": 6, "type": "numeric",
+    "promptHTML": "Two pencils and one rubber cost 80p. One pencil and one rubber cost 55p. How much (p) does one pencil cost?",
+    "answer": { "value": 25, "tolerance": 0, "accept": ["25", "25p"] },
+    "explanation": "The difference between the two buys is exactly one extra pencil.",
+    "workedSteps": ["80p − 55p = 25p", "That extra item is one pencil → 25p"],
+    "keyConcept": "Compare two totals to isolate one item's price."
+  },
+  {
+    "id": "cur-030", "topicId": "statistics", "level": 4, "type": "mcq",
+    "promptHTML": "A pictogram uses ◓ to mean 4 books. A row shows 3 and a half symbols. How many books is that?",
+    "choices": [
+      { "text": "14", "correct": true },
+      { "text": "12", "correct": false, "misconceptionId": "ignored_half" },
+      { "text": "7", "correct": false, "misconceptionId": "added" },
+      { "text": "16", "correct": false, "misconceptionId": "rounded_up" }
+    ],
+    "misconceptions": {
+      "ignored_half": "You ignored the half symbol — half of 4 is 2 more.",
+      "added": "Multiply symbols by the key, don't add.",
+      "rounded_up": "Use the half exactly: 3.5 × 4."
+    },
+    "explanation": "Each symbol is 4 books, so 3.5 symbols is 3.5 × 4.",
+    "workedSteps": ["3 symbols = 12", "Half symbol = 2", "12 + 2 = 14"],
+    "keyConcept": "Part symbols on a pictogram count as part of the key value."
+  },
+  {
+    "id": "cur-031", "topicId": "measurement", "level": 6, "type": "numeric",
+    "promptHTML": "A car travels 150 km in 2 hours. Travelling at the same speed, how far (km) does it go in 5 hours?",
+    "answer": { "value": 375, "tolerance": 0, "accept": ["375"] },
+    "explanation": "Find the speed (distance per hour), then multiply by the new time.",
+    "workedSteps": ["150 ÷ 2 = 75 km/h", "75 × 5 = 375 km"],
+    "keyConcept": "Distance = speed × time; find the unit rate first."
+  },
+  {
+    "id": "cur-032", "topicId": "fractions", "level": 6, "type": "numeric",
+    "promptHTML": "3/8 of a number is 18. What is the number?",
+    "answer": { "value": 48, "tolerance": 0, "accept": ["48"] },
+    "explanation": "If 3/8 is 18, then 1/8 is 6, so the whole (8/8) is 48.",
+    "workedSteps": ["3/8 = 18 → 1/8 = 6", "8 × 6 = 48"],
+    "keyConcept": "Find the unit fraction, then build up to the whole."
+  },
+  {
+    "id": "cur-033", "topicId": "place-value", "level": 6, "type": "numeric",
+    "promptHTML": "Using each of the digits 4, 7, 1 and 9 exactly once, what is the largest 4-digit number you can make?",
+    "answer": { "value": 9741, "tolerance": 0, "accept": ["9741"] },
+    "explanation": "Put the biggest digits in the highest place-value columns.",
+    "workedSteps": ["Order digits high → low: 9, 7, 4, 1", "Largest = 9741"],
+    "keyConcept": "Largest number: biggest digits go in the biggest places."
+  },
+  {
+    "id": "cur-034", "topicId": "decimals", "level": 6, "type": "numeric",
+    "promptHTML": "A bag of 12 identical apples weighs 2.4 kg. What does one apple weigh in grams?",
+    "answer": { "value": 200, "tolerance": 0, "accept": ["200", "200g"] },
+    "explanation": "Convert kg to g, then divide by the number of apples.",
+    "workedSteps": ["2.4 kg = 2400 g", "2400 ÷ 12 = 200 g"],
+    "keyConcept": "Convert units first, then divide for the unit value."
+  },
+  {
+    "id": "cur-035", "topicId": "pav", "level": 4, "type": "numeric",
+    "promptHTML": "A square has a perimeter of 36 cm. What is its area (cm²)?",
+    "answer": { "value": 81, "tolerance": 0, "accept": ["81"] },
+    "explanation": "Find the side from the perimeter, then square it for the area.",
+    "workedSteps": ["Side = 36 ÷ 4 = 9 cm", "Area = 9 × 9 = 81 cm²"],
+    "keyConcept": "Link perimeter and area through the side length."
+  },
+  {
+    "id": "cur-036", "topicId": "ratio", "level": 6, "type": "numeric",
+    "promptHTML": "A 1.5-litre carton of juice serves 6 people. How many millilitres does each person get?",
+    "answer": { "value": 250, "tolerance": 0, "accept": ["250", "250ml"] },
+    "explanation": "Convert litres to millilitres, then share equally.",
+    "workedSteps": ["1.5 L = 1500 ml", "1500 ÷ 6 = 250 ml"],
+    "keyConcept": "Convert to a sensible unit before sharing."
+  },
+  {
+    "id": "cur-037", "topicId": "geometry", "level": 4, "type": "mcq",
+    "promptHTML": "Which of these statements about a rectangle is always true?",
+    "choices": [
+      { "text": "All four angles are right angles", "correct": true },
+      { "text": "All four sides are equal", "correct": false, "misconceptionId": "square_rule" },
+      { "text": "It has no lines of symmetry", "correct": false, "misconceptionId": "no_sym" },
+      { "text": "Diagonals are perpendicular", "correct": false, "misconceptionId": "rhombus_rule" }
+    ],
+    "misconceptions": {
+      "square_rule": "Equal sides describes a square — a special rectangle, not all rectangles.",
+      "no_sym": "A rectangle has 2 lines of symmetry.",
+      "rhombus_rule": "Perpendicular diagonals describe a rhombus, not a rectangle."
+    },
+    "explanation": "Every rectangle has four right angles; only a square also has four equal sides.",
+    "workedSteps": ["Rectangle: 4 right angles, opposite sides equal."],
+    "keyConcept": "Know the defining properties of each quadrilateral."
+  },
+  {
+    "id": "cur-038", "topicId": "algebra", "level": 5, "type": "numeric",
+    "promptHTML": "In the pattern of growing squares, shape 1 uses 4 sticks, shape 2 uses 7, shape 3 uses 10. How many sticks does shape 10 use?",
+    "answer": { "value": 31, "tolerance": 0, "accept": ["31"] },
+    "explanation": "The rule is 3n + 1 (it goes up by 3 each time, starting from 4).",
+    "workedSteps": ["Rule: 3n + 1", "3 × 10 + 1 = 31"],
+    "keyConcept": "Find the nth-term rule, then substitute the position."
+  },
+  {
+    "id": "cur-039", "topicId": "percentages", "level": 5, "type": "numeric",
+    "promptHTML": "Syon scored 18 out of 24 in a test. What percentage is that?",
+    "answer": { "value": 75, "tolerance": 0, "accept": ["75", "75%"] },
+    "explanation": "Percentage = (score ÷ total) × 100.",
+    "workedSteps": ["18 ÷ 24 = 0.75", "0.75 × 100 = 75%"],
+    "keyConcept": "Score as a percentage = part ÷ whole × 100."
+  },
+  {
+    "id": "cur-040", "topicId": "multiply-divide", "level": 5, "type": "numeric",
+    "promptHTML": "What is the smallest number greater than 1 that is both a multiple of 4 and a multiple of 6?",
+    "answer": { "value": 12, "tolerance": 0, "accept": ["12"] },
+    "explanation": "This is the lowest common multiple (LCM) of 4 and 6.",
+    "workedSteps": ["Multiples of 4: 4, 8, 12 …", "Multiples of 6: 6, 12 …", "First shared = 12"],
+    "keyConcept": "The LCM is the first multiple two numbers share."
+  },
+  {
+    "id": "cur-041", "topicId": "add-subtract", "level": 3, "type": "numeric",
+    "promptHTML": "A shop had 530 apples. It sold 248 in the morning and 167 in the afternoon. How many apples are left?",
+    "answer": { "value": 115, "tolerance": 0, "accept": ["115"] },
+    "explanation": "Add the two amounts sold, then subtract from the start.",
+    "workedSteps": ["248 + 167 = 415", "530 − 415 = 115"],
+    "keyConcept": "Combine like steps before the final operation."
+  },
+  {
+    "id": "cur-042", "topicId": "measurement", "level": 3, "type": "numeric",
+    "promptHTML": "A piece of string is 3 m long. Syon cuts off 145 cm. How many centimetres of string are left?",
+    "answer": { "value": 155, "tolerance": 0, "accept": ["155", "155cm"] },
+    "explanation": "Convert to the same unit (cm) first, then subtract.",
+    "workedSteps": ["3 m = 300 cm", "300 − 145 = 155 cm"],
+    "keyConcept": "Always work in the same unit before adding or subtracting."
+  },
+  {
+    "id": "cur-043", "topicId": "ratio", "level": 6, "type": "numeric",
+    "promptHTML": "In a box, red and blue pens are in the ratio 4 : 7. When 12 more red pens are added, the ratio becomes 1 : 1. How many blue pens are there?",
+    "answer": { "value": 28, "tolerance": 0, "accept": ["28"] },
+    "explanation": "Let one part = p. Red = 4p, blue = 7p. After adding 12 red, reds equal blues.",
+    "workedSteps": ["4p + 12 = 7p", "3p = 12 → p = 4", "Blue = 7 × 4 = 28"],
+    "keyConcept": "Form an equation from the 'after' ratio."
+  },
+  {
+    "id": "cur-044", "topicId": "percentages", "level": 6, "type": "numeric",
+    "promptHTML": "A price including 20% VAT is £54. What was the price (£) before VAT was added?",
+    "answer": { "value": 45, "tolerance": 0.01, "accept": ["45", "£45", "45.00"] },
+    "explanation": "£54 is 120% of the pre-VAT price. Divide by 1.2 (or find 1% then 100%).",
+    "workedSteps": ["120% = £54", "1% = £0.45", "100% = £45"],
+    "keyConcept": "Reverse percentage: divide by the multiplier."
+  },
+  {
+    "id": "cur-045", "topicId": "algebra", "level": 6, "type": "numeric",
+    "promptHTML": "The sum of three consecutive even numbers is 90. What is the largest of them?",
+    "answer": { "value": 32, "tolerance": 0, "accept": ["32"] },
+    "explanation": "The middle even number is the mean: 90 ÷ 3 = 30. The numbers are 28, 30, 32.",
+    "workedSteps": ["90 ÷ 3 = 30 (middle)", "28, 30, 32", "Largest = 32"],
+    "keyConcept": "For evenly spaced numbers, the middle one is the mean."
+  },
+  {
+    "id": "cur-046", "topicId": "fractions", "level": 6, "type": "mcq",
+    "promptHTML": "Which fraction is the largest: 5/8, 7/12 or 2/3?",
+    "choices": [
+      { "text": "2/3", "correct": true },
+      { "text": "5/8", "correct": false, "misconceptionId": "biggest_num" },
+      { "text": "7/12", "correct": false, "misconceptionId": "biggest_den" },
+      { "text": "They are equal", "correct": false, "misconceptionId": "equal" }
+    ],
+    "misconceptions": {
+      "biggest_num": "Use a common denominator (24): 5/8 = 15/24.",
+      "biggest_den": "7/12 = 14/24 — not the largest.",
+      "equal": "15/24, 14/24, 16/24 are not equal."
+    },
+    "explanation": "Common denominator 24: 5/8 = 15/24, 7/12 = 14/24, 2/3 = 16/24.",
+    "workedSteps": ["5/8 = 15/24", "7/12 = 14/24", "2/3 = 16/24 → largest"],
+    "keyConcept": "Compare fractions with a common denominator."
+  },
+  {
+    "id": "cur-047", "topicId": "multiply-divide", "level": 6, "type": "numeric",
+    "promptHTML": "What is the smallest 3-digit number that is a multiple of both 6 and 9?",
+    "answer": { "value": 108, "tolerance": 0, "accept": ["108"] },
+    "explanation": "The LCM of 6 and 9 is 18. The first 3-digit multiple of 18 is needed.",
+    "workedSteps": ["LCM(6, 9) = 18", "18 × 6 = 108 (first ≥ 100)"],
+    "keyConcept": "Common multiples come from the LCM."
+  },
+  {
+    "id": "cur-048", "topicId": "measurement", "level": 6, "type": "numeric",
+    "promptHTML": "A train travels 240 km in 3 hours. At the same speed, how many minutes does it take to travel 80 km?",
+    "answer": { "value": 60, "tolerance": 0, "accept": ["60"] },
+    "explanation": "Speed = 240 ÷ 3 = 80 km/h, so 80 km takes exactly 1 hour = 60 minutes.",
+    "workedSteps": ["Speed = 240 ÷ 3 = 80 km/h", "80 km ÷ 80 km/h = 1 hour = 60 min"],
+    "keyConcept": "Find the unit rate, then convert hours to minutes."
+  },
+  {
+    "id": "cur-049", "topicId": "pav", "level": 6, "type": "numeric",
+    "promptHTML": "A cuboid measures 5 cm × 4 cm × 3 cm. What is the difference between its volume (in cm³) and its surface area (in cm²)?",
+    "answer": { "value": 34, "tolerance": 0, "accept": ["34"] },
+    "explanation": "Volume = 5×4×3 = 60. Surface area = 2(5×4 + 4×3 + 5×3) = 94. Difference = 94 − 60.",
+    "workedSteps": ["Volume = 60", "Surface area = 2(20+12+15) = 94", "94 − 60 = 34"],
+    "keyConcept": "Know both the volume and surface-area formulas for a cuboid."
+  },
+  {
+    "id": "cur-050", "topicId": "statistics", "level": 6, "type": "numeric",
+    "promptHTML": "Four numbers have a mean of 12. A fifth number is added and the mean becomes 13. What is the fifth number?",
+    "answer": { "value": 17, "tolerance": 0, "accept": ["17"] },
+    "explanation": "Old total = 12 × 4 = 48. New total = 13 × 5 = 65. Fifth = 65 − 48.",
+    "workedSteps": ["48 then 65", "65 − 48 = 17"],
+    "keyConcept": "Means hinge on total = mean × count."
+  },
+  {
+    "id": "cur-051", "topicId": "percentages", "level": 6, "type": "numeric",
+    "promptHTML": "A shop buys a bike for £40 and sells it for £50. What is the percentage profit?",
+    "answer": { "value": 25, "tolerance": 0, "accept": ["25", "25%"] },
+    "explanation": "Profit = £10. Percentage profit = (profit ÷ cost) × 100 = (10 ÷ 40) × 100.",
+    "workedSteps": ["Profit = £50 − £40 = £10", "10 ÷ 40 × 100 = 25%"],
+    "keyConcept": "% profit is relative to the COST price."
+  },
+  {
+    "id": "cur-052", "topicId": "algebra", "level": 6, "type": "numeric",
+    "promptHTML": "3 apples and 2 bananas cost 145p. 3 apples and 5 bananas cost 220p. How much (p) is one banana?",
+    "answer": { "value": 25, "tolerance": 0, "accept": ["25", "25p"] },
+    "explanation": "The only difference between the two buys is 3 extra bananas, costing 220 − 145 = 75p.",
+    "workedSteps": ["220 − 145 = 75p for 3 bananas", "75 ÷ 3 = 25p"],
+    "keyConcept": "Subtract two equations to eliminate the common item."
+  },
+  {
+    "id": "cur-053", "topicId": "fractions", "level": 6, "type": "numeric",
+    "promptHTML": "Syon spends 2/5 of his money, then 1/3 of what is left. He now has £24. How much (£) did he start with?",
+    "answer": { "value": 60, "tolerance": 0, "accept": ["60", "£60"] },
+    "explanation": "After 2/5 spent, 3/5 remains. Spending 1/3 of that leaves 2/3 of 3/5 = 2/5 of the original.",
+    "workedSteps": ["Left = 2/3 × 3/5 = 2/5 of start", "2/5 of start = £24", "Start = £60"],
+    "keyConcept": "Track the fraction of the ORIGINAL that remains."
+  },
+  {
+    "id": "cur-054", "topicId": "ratio", "level": 6, "type": "numeric",
+    "promptHTML": "A map has a scale of 1 : 50000. Two towns are 4.5 cm apart on the map. How far apart are they in real life (km)?",
+    "answer": { "value": 2.25, "tolerance": 0.001, "accept": ["2.25", "2.25km"] },
+    "explanation": "4.5 cm × 50000 = 225000 cm. Convert cm → m (÷100) → km (÷1000).",
+    "workedSteps": ["4.5 × 50000 = 225000 cm", "= 2250 m = 2.25 km"],
+    "keyConcept": "Apply the scale, then convert units carefully."
+  },
+  {
+    "id": "cur-055", "topicId": "geometry", "level": 6, "type": "numeric",
+    "promptHTML": "Each interior angle of a regular polygon is 156°. How many sides does it have?",
+    "answer": { "value": 15, "tolerance": 0, "accept": ["15"] },
+    "explanation": "Exterior angle = 180 − 156 = 24°. Number of sides = 360 ÷ exterior angle.",
+    "workedSteps": ["Exterior = 180 − 156 = 24°", "360 ÷ 24 = 15 sides"],
+    "keyConcept": "Sides = 360 ÷ exterior angle."
+  },
+  {
+    "id": "cur-056", "topicId": "place-value", "level": 6, "type": "numeric",
+    "promptHTML": "Round 2,748,396 to the nearest hundred thousand.",
+    "answer": { "value": 2700000, "tolerance": 0, "accept": ["2700000", "2,700,000"] },
+    "explanation": "Look at the ten-thousands digit (4). 4 is less than 5, so round down.",
+    "workedSteps": ["Hundred-thousands digit is 7; next digit 4 < 5", "→ 2,700,000"],
+    "keyConcept": "Round using the digit just below the rounding place."
+  },
+  {
+    "id": "cur-057", "topicId": "decimals", "level": 6, "type": "numeric",
+    "promptHTML": "0.6 of a number is 0.45. What is the number?",
+    "answer": { "value": 0.75, "tolerance": 0.001, "accept": ["0.75"] },
+    "explanation": "Number = 0.45 ÷ 0.6.",
+    "workedSteps": ["0.45 ÷ 0.6 = 0.75"],
+    "keyConcept": "Reverse 'of' (×) with division."
+  },
+  {
+    "id": "cur-058", "topicId": "statistics", "level": 6, "type": "mcq",
+    "promptHTML": "For the set 4, 4, 7, 9, 11 — which statement is true?",
+    "choices": [
+      { "text": "mean = median", "correct": true },
+      { "text": "mode is the largest average", "correct": false, "misconceptionId": "mode_big" },
+      { "text": "range < median", "correct": false, "misconceptionId": "range_small" },
+      { "text": "mean = mode", "correct": false, "misconceptionId": "mean_mode" }
+    ],
+    "misconceptions": {
+      "mode_big": "Mode = 4, the smallest of the averages here.",
+      "range_small": "Range = 11 − 4 = 7, which equals the median, not less.",
+      "mean_mode": "Mean = 7 but mode = 4."
+    },
+    "explanation": "Mean = 35 ÷ 5 = 7; median (middle of sorted) = 7; mode = 4; range = 7.",
+    "workedSteps": ["Mean = 35÷5 = 7", "Median = 7", "Mode = 4, Range = 7", "So mean = median"],
+    "keyConcept": "Compute all four measures, then compare."
+  }
+]

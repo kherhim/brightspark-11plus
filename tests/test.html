@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Syon 11+ — Test Suite</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 30px; color: #1e293b; }
+    h1 { font-size: 1.4rem; }
+    h2.pass { color: #16a34a; }
+    h2.fail { color: #dc2626; }
+    pre { background: #f1f5f9; padding: 16px; border-radius: 8px;
+          white-space: pre-wrap; font-size: 0.85rem; }
+    .hint { color: #64748b; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Syon 11+ Maths — Test Suite</h1>
+  <p class="hint">Serve over http (e.g. <code>python3 -m http.server</code>) and open
+    <code>/tests/test.html</code>. Results appear below and in the console.</p>
+  <div id="out">Running…</div>
+
+  <script type="module">
+    import "./generators.test.js";
+    import "./engine.test.js";
+    import "./curated.test.js";
+    import { report } from "./harness.js";
+    // Allow the top-level await in curated.test.js to settle first.
+    setTimeout(() => report(), 200);
+  </script>
+</body>
+</html>

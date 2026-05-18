@@ -33,8 +33,14 @@ child's name on the Parent page to personalise it).
   then a marked report (score, an 11+ readiness band, per-topic breakdown)
   with every question worked through. A mock **informs** progress but
   **never moves the practice difficulty** up or down.
+- **Smart review + fix-it**: every wrong answer (practice or mock) is logged
+  and queued on a **Leitner spaced-repetition** schedule, then re-tested
+  *with fresh numbers* so the child relearns the method, not a memorised
+  answer. When one misconception keeps recurring, a targeted **fix-it
+  mini-lesson + 5-question drill** is offered.
 - **Parent dashboard**: set the child's name, see per-topic level, accuracy,
-  time on task, recent mistakes, and export/import/reset progress.
+  time on task, **top error patterns**, the full mistake log (practice /
+  mock / review), and export/import/reset progress.
 
 ## Run it locally
 
@@ -85,7 +91,9 @@ The suite checks every generator at every level (valid structure, clean
 answers, unique multiple-choice options, deterministic from a seed), the
 adaptive engine's promotion/demotion/mastery rules, the **v3→v4 migration**
 (existing progress is preserved), **mock mode** (seed reproducibility and that
-a mock never moves the ladder), and the curated schema.
+a mock never moves the ladder), **smart review** (Leitner promotion/demotion,
+misconception aggregation, fresh same-template re-draw), and the curated
+schema.
 
 ## Tweaking it
 
@@ -105,13 +113,14 @@ Plain HTML + CSS + ES modules, no framework:
 
 ```
 index.html · style.css · .nojekyll
-js/  rng · format · store · topics · engine · questionFactory · curated · main
+js/  rng · format · store · topics · engine · questionFactory · curated ·
+     review · fixits · main
 js/persistence/  adapter · localAdapter   (one async surface; cloud-sync ready)
 js/generators/  _shared + 12 topic modules + index
 js/ui/  router · components · screenHome · screenQuiz · screenMock ·
-        screenTopics · screenParent
-data/curated.json
-tests/  test.html · harness · *.test.js (incl. migration, mock) · run-node.mjs
+        screenReview · screenTopics · screenParent
+data/  curated.json · fixits.json
+tests/  test.html · harness · *.test.js (migration, mock, review, …) · run-node.mjs
 ```
 
 The app never touches `localStorage` directly — every screen goes through
@@ -121,8 +130,10 @@ adds optional cross-device sync with **no screen changes**.
 
 ## Roadmap
 
-- **Phase 2 — Smart review + fix-it**: spaced re-testing of the child's *own*
-  mistakes, plus auto-detected recurring-error mini-lessons.
+- **Phase 1 — ✅ shipped**: timed mock exams, schema v4 + safe migration,
+  persistence adapter (cloud-sync ready).
+- **Phase 2 — ✅ shipped**: smart review (Leitner spaced repetition of the
+  child's own mistakes) + auto-detected recurring-error fix-it lessons.
 - **Phase 3 — Readiness & speed analytics**: an explainable readiness band
   tuned to a target board (GL/CEM/ISEB/CSSE) and "accurate but too slow"
   fluency flags.

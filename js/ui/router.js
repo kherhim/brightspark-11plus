@@ -5,6 +5,7 @@
 //   #/quiz/<topicId>    practice one topic
 //   #/mock              timed mock-exam setup
 //   #/mock/<subject>    mock exam for a subject (deep link)
+//   #/review            spaced review of past mistakes + fix-it
 //   #/parent            parent dashboard
 
 export function parseHash() {

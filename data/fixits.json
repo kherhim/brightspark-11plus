@@ -1,0 +1,131 @@
+{
+  "byMisconception": {
+    "ar_perim": {
+      "title": "Area vs perimeter",
+      "explanationHTML": "<b>Perimeter</b> is the distance all the way <i>around</i> a shape (add the sides). <b>Area</b> is the space <i>inside</i> it (for a rectangle, length × width). They are different measurements with different units (cm vs cm²).",
+      "workedExample": "A 6 cm × 4 cm rectangle: perimeter = 6+4+6+4 = 20 cm, but area = 6 × 4 = 24 cm²."
+    },
+    "ar_add": {
+      "title": "Area is multiply, not add",
+      "explanationHTML": "For a rectangle, <b>area = length × width</b>. Adding the two sides gives you half the perimeter, not the area.",
+      "workedExample": "8 cm by 5 cm → area = 8 × 5 = 40 cm² (not 8 + 5 = 13)."
+    },
+    "tr_nohalf": {
+      "title": "Triangles need the ½",
+      "explanationHTML": "A triangle is exactly <b>half</b> of the rectangle around it, so <b>area = ½ × base × height</b>. Forgetting the ÷ 2 doubles your answer.",
+      "workedExample": "base 10, height 6 → ½ × 10 × 6 = 30 (not 60)."
+    },
+    "tr_add": {
+      "title": "Triangle area: multiply, then halve",
+      "explanationHTML": "Use <b>½ × base × height</b> — multiply the base and height, then halve. Adding base + height is not area.",
+      "workedExample": "base 12, height 5 → ½ × 12 × 5 = 30 cm²."
+    },
+    "vc_add": {
+      "title": "Volume multiplies three lengths",
+      "explanationHTML": "<b>Volume of a cuboid = length × width × height</b> (cm³). Adding the three edges gives a length, not a volume.",
+      "workedExample": "5 × 3 × 2 = 30 cm³ (not 5 + 3 + 2 = 10)."
+    },
+    "vc_sa": {
+      "title": "Volume vs surface area",
+      "explanationHTML": "<b>Volume</b> is the space inside (l × w × h, in cm³). <b>Surface area</b> is the total of all 6 faces (in cm²). The question word — 'fits inside' vs 'covers' — tells you which.",
+      "workedExample": "2×3×4 cuboid: volume = 24 cm³; surface area = 2(6+8+12) = 52 cm²."
+    },
+    "vc_face": {
+      "title": "A cuboid has all three dimensions",
+      "explanationHTML": "Multiplying only two edges gives the area of one <i>face</i>. Volume needs <b>all three</b> edges multiplied together.",
+      "workedExample": "5 × 3 is a face (15 cm²); 5 × 3 × 2 = 30 cm³ is the volume."
+    },
+    "mn_sum": {
+      "title": "Mean: don't forget to divide",
+      "explanationHTML": "The <b>mean</b> is the total <b>÷ how many numbers</b> there are. The sum on its own is not the mean.",
+      "workedExample": "4, 6, 8, 2 → total 20, count 4 → mean = 20 ÷ 4 = 5."
+    },
+    "mn_div": {
+      "title": "Divide by how many numbers",
+      "explanationHTML": "For the mean, divide the total by the <b>count of values</b> — not one less. Five numbers means ÷ 5.",
+      "workedExample": "Five numbers totalling 40 → mean = 40 ÷ 5 = 8 (not ÷ 4)."
+    },
+    "mn_count": {
+      "title": "The mean is a value, not the count",
+      "explanationHTML": "How many numbers there are is the <b>count</b>. The <b>mean</b> is total ÷ count — a different thing.",
+      "workedExample": "3, 7, 5 → count = 3, but mean = 15 ÷ 3 = 5."
+    },
+    "me_mean": {
+      "title": "Median is the middle, not the mean",
+      "explanationHTML": "The <b>median</b> is the middle value once the numbers are <b>in order</b>. The mean (add up, divide) is usually different.",
+      "workedExample": "1, 2, 9 → median = 2 (the middle), mean = 4."
+    },
+    "me_max": {
+      "title": "Median is the middle, not the largest",
+      "explanationHTML": "Put the numbers <b>in order</b> and take the one in the <b>middle</b>. The biggest number is the maximum, not the median.",
+      "workedExample": "3, 8, 4 → ordered 3, 4, 8 → median = 4 (not 8)."
+    },
+    "me_unsorted": {
+      "title": "Sort before you take the middle",
+      "explanationHTML": "The median is the middle value <b>after sorting</b>. Taking the middle of the unsorted list gives the wrong number.",
+      "workedExample": "7, 2, 5 → sort to 2, 5, 7 → median = 5."
+    },
+    "rg_add": {
+      "title": "Range is a subtraction",
+      "explanationHTML": "<b>Range = largest − smallest</b>. It measures the spread, so you subtract — never add.",
+      "workedExample": "Data 4 … 19 → range = 19 − 4 = 15."
+    },
+    "rg_max": {
+      "title": "Range is the gap, not the biggest",
+      "explanationHTML": "The range is how far apart the values are: <b>largest − smallest</b>, not the largest value itself.",
+      "workedExample": "Smallest 6, largest 20 → range = 20 − 6 = 14 (not 20)."
+    },
+    "pb_wrong_total": {
+      "title": "Probability is out of the TOTAL",
+      "explanationHTML": "Probability = <b>wanted outcomes ÷ total outcomes</b>. The denominator is <i>every</i> item, not just the others.",
+      "workedExample": "3 red of (3+5) = 8 counters → P(red) = 3/8."
+    },
+    "pb_red": {
+      "title": "Answer the colour that was asked",
+      "explanationHTML": "Check which outcome the question wants. Working out a different colour's probability is a common slip.",
+      "workedExample": "Asked for blue with 2 blue of 10 → P(blue) = 2/10 = 1/5."
+    },
+    "fw_wrong_base": {
+      "title": "‘Of what is left’ uses the new amount",
+      "explanationHTML": "After spending some, the next fraction is taken from <b>what remains</b>, not from the original total. Work one step at a time.",
+      "workedExample": "£24, spend 1/3 → £8 gone, £16 left. Then 1/4 of <b>£16</b> = £4, so £12 left."
+    },
+    "fw_stop": {
+      "title": "Finish every step",
+      "explanationHTML": "Multi-step problems aren't done after the first step. Re-read what is asked and carry the working all the way to the end.",
+      "workedExample": "£24 → after 1/3 spent, £16 left → after 1/4 of that spent, £12 left (the final answer)."
+    },
+    "fw_spent": {
+      "title": "Spent vs left",
+      "explanationHTML": "Read carefully whether the question wants how much was <b>spent</b> or how much is <b>left</b> — they are different numbers.",
+      "workedExample": "Spent £8 of £24 → £8 is spent, but £16 is what's left."
+    }
+  },
+  "byArea": {
+    "Number": {
+      "title": "Slow down on number work",
+      "explanationHTML": "Most number slips are <b>misreading the question</b> or a careless step. Underline exactly what is asked, work one step at a time, and check the size of your answer makes sense.",
+      "workedExample": "Estimate first: 412 − 187 should be about 400 − 200 = 200, so an answer of 225 is sensible, 595 is not."
+    },
+    "Reasoning": {
+      "title": "Turn words into a clear plan",
+      "explanationHTML": "For ratio, algebra and sequences, write down what each part or letter stands for <b>before</b> calculating. Find the value of <b>one part</b> first, then build the rest.",
+      "workedExample": "Ratio 3:5, 24 apples → 1 part = 24 ÷ 3 = 8, so oranges = 5 × 8 = 40."
+    },
+    "Measurement": {
+      "title": "Check the units first",
+      "explanationHTML": "Before adding or subtracting, make sure everything is in the <b>same unit</b> (all cm, or all minutes). Mixed units cause most measurement mistakes.",
+      "workedExample": "3 m − 145 cm → make both cm: 300 − 145 = 155 cm."
+    },
+    "Geometry": {
+      "title": "Name the property you're using",
+      "explanationHTML": "Angle problems rely on a fact (angles on a line = 180°, in a triangle = 180°, round a point = 360°). State the fact, then form the calculation.",
+      "workedExample": "Angles on a straight line: 180 − 115 = 65°."
+    },
+    "Data": {
+      "title": "Mean, median, mode, range — pick the right one",
+      "explanationHTML": "Each average answers a different question: <b>mean</b> = total ÷ count, <b>median</b> = middle (sorted), <b>mode</b> = most common, <b>range</b> = largest − smallest. Match the word in the question to the method.",
+      "workedExample": "2, 5, 5, 8: mean 5, median 5, mode 5, range 6."
+    }
+  }
+}

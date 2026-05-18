@@ -172,6 +172,8 @@ export function renderQuiz(ctx, params) {
         level: current.level,
         timeMs,
         qid: q.id,
+        seed: q.seed ?? null,
+        templateId: q.templateId ?? null,
         chosenText: chosen.text ?? null,
         chosenKey: chosen.key ?? null,
         correctText,

@@ -4,6 +4,7 @@
 
 import { TOPICS, MAX_LEVEL, MIN_LEVEL } from "./topics.js";
 import { ensureTopic } from "./store.js";
+import { enqueueLeitner } from "./review.js";
 
 // --- Tunable constants ----------------------------------------------------
 export const PROMOTE_THRESHOLD = 2; // correct-in-a-row to go up a level
@@ -35,6 +36,41 @@ export function isMastered(ts) {
     ts.mastery >= MASTERY_MIN &&
     ts.attempts >= MASTERY_MIN_ATTEMPTS
   );
+}
+
+// One wrong answer (practice OR mock): tally the misconception on the
+// topic and globally, append to the persistent mistake log, and (re)queue
+// it for spaced review. `near_miss` is generic distractor padding, not a
+// real misconception, so it never feeds the aggregation.
+function noteWrong(state, topicId, ts, info, source) {
+  const mid = info.misconceptionId ?? null;
+  if (mid && mid !== "near_miss") {
+    ts.misconceptionCounts = ts.misconceptionCounts || {};
+    ts.misconceptionCounts[mid] = (ts.misconceptionCounts[mid] || 0) + 1;
+    state.misconceptionCounts = state.misconceptionCounts || {};
+    state.misconceptionCounts[mid] = (state.misconceptionCounts[mid] || 0) + 1;
+  }
+  logMistake(state, {
+    topicId,
+    qid: info.qid ?? null,
+    seed: info.seed ?? null,
+    level: info.level,
+    templateId: info.templateId ?? null,
+    source,
+    chosenKey: info.chosenKey ?? null,
+    chosenText: info.chosenText ?? null,
+    correctText: info.correctText ?? null,
+    misconceptionId: mid,
+    at: Date.now(),
+  });
+  enqueueLeitner(state, {
+    topicId,
+    level: info.level,
+    qid: info.qid ?? null,
+    seed: info.seed ?? null,
+    templateId: info.templateId ?? null,
+    misconceptionId: mid,
+  });
 }
 
 // Record a *graded* answer and advance the ladder. Mutates and returns the
@@ -70,6 +106,7 @@ export function recordResult(state, topicId, info) {
     if (ts.recentMistakes.length > MAX_RECENT_MISTAKES) {
       ts.recentMistakes.shift();
     }
+    noteWrong(state, topicId, ts, info, info.source || "practice");
   }
 
   // EWMA mastery, weighted by the level the answer was earned at.
@@ -175,24 +212,22 @@ export function recordMockOutcome(state, record) {
       ts.correct += 1;
       state.global.totalCorrect += 1;
     } else {
-      const mid = it.misconceptionId || null;
-      if (mid) {
-        ts.misconceptionCounts = ts.misconceptionCounts || {};
-        ts.misconceptionCounts[mid] = (ts.misconceptionCounts[mid] || 0) + 1;
-      }
-      logMistake(state, {
-        topicId: it.topicId,
-        qid: it.qid,
-        seed: it.seed ?? null,
-        level: it.level,
-        templateId: it.templateId ?? null,
-        source: "mock",
-        chosenKey: it.chosenKey ?? null,
-        chosenText: it.chosenText ?? null,
-        correctText: it.correctText ?? null,
-        misconceptionId: mid,
-        at: Date.now(),
-      });
+      noteWrong(
+        state,
+        it.topicId,
+        ts,
+        {
+          qid: it.qid,
+          seed: it.seed ?? null,
+          level: it.level,
+          templateId: it.templateId ?? null,
+          chosenKey: it.chosenKey ?? null,
+          chosenText: it.chosenText ?? null,
+          correctText: it.correctText ?? null,
+          misconceptionId: it.misconceptionId ?? null,
+        },
+        "mock"
+      );
     }
 
     // Muted EWMA — informs, never moves streak/level.

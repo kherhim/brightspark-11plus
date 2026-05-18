@@ -59,6 +59,26 @@ export function getQuestionById(qid) {
   return getQuestion(topicId, Number(lvl), Number(seed));
 }
 
+// A FRESH instance of a specific template (new numbers, same method).
+// Used by spaced review to re-test the method a child slipped on without
+// re-showing the exact numbers they may have memorised. Falls back to a
+// normal question if the template no longer exists (e.g. curated).
+export function freshQuestionFromTemplate(topicId, level, templateId) {
+  const gen = GENERATORS[topicId];
+  const seed = freshSeed();
+  if (!gen) return null;
+  const t = gen.templates.find((x) => x.id === templateId);
+  if (!t) return getQuestion(topicId, level, seed);
+  const lvl = Math.min(Math.max(level || t.min, t.min), t.max);
+  const rng = makeRng(seed);
+  const question = t.fn(lvl, rng);
+  question.templateId = t.id;
+  question.source = question.source || "generated";
+  question.seed = seed;
+  question.id = `${topicId}:L${lvl}:s=${seed}`;
+  return question;
+}
+
 // Count the question "forms" in the bank. A form = one template available
 // at one difficulty level (each form produces unlimited randomised
 // instances), plus each curated problem. Also returns a conservative

@@ -3,11 +3,13 @@
 
 import { activeAdapter } from "./persistence/adapter.js";
 import { loadCurated } from "./curated.js";
+import { loadFixits } from "./fixits.js";
 import { startRouter, parseHash, navigate } from "./ui/router.js";
 import { renderHome } from "./ui/screenHome.js";
 import { renderTopics } from "./ui/screenTopics.js";
 import { renderQuiz } from "./ui/screenQuiz.js";
 import { renderMock } from "./ui/screenMock.js";
+import { renderReview } from "./ui/screenReview.js";
 import { renderParent } from "./ui/screenParent.js";
 
 const mount = document.getElementById("app");
@@ -45,6 +47,7 @@ const SCREENS = {
   topics: renderTopics,
   quiz: renderQuiz,
   mock: renderMock,
+  review: renderReview,
   parent: renderParent,
 };
 
@@ -67,6 +70,7 @@ function route({ name, params }) {
 
 async function boot() {
   await loadCurated();
+  await loadFixits();
   ctx.state = await activeAdapter.load();
   if (!activeAdapter.isAvailable()) {
     ctx.setNotice(

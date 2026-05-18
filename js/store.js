@@ -88,6 +88,7 @@ export function freshState() {
     badges: {}, // badgeId -> earnedAt (Phase 4)
     mistakeLog: [], // persistent, capped (Phase 2)
     leitner: { boxes: {} }, // spaced-repetition queue (Phase 2)
+    misconceptionCounts: {}, // global misconceptionId -> count (Phase 2)
     mockHistory: [], // last mock papers, capped (Phase 1)
     lastTopicId: null,
     topics,
@@ -125,6 +126,8 @@ function ensureV4Shape(state) {
   state.mockHistory = Array.isArray(state.mockHistory)
     ? state.mockHistory
     : [];
+  if (!state.misconceptionCounts || typeof state.misconceptionCounts !== "object")
+    state.misconceptionCounts = {};
 
   // Every registered topic must exist and carry the v4 per-topic fields.
   for (const t of TOPICS) {

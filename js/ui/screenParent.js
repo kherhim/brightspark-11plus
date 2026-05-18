@@ -1,8 +1,10 @@
 import { h, button, levelDots, masteryBadge, clear } from "./components.js";
-import { TOPICS } from "../topics.js";
+import { TOPICS, topicById } from "../topics.js";
 import { ensureTopic, exportJSON, importJSON, resetState } from "../store.js";
 import { fmtDuration } from "../format.js";
 import { countForms } from "../questionFactory.js";
+import { topicForMisconception } from "../review.js";
+import { getFixit } from "../fixits.js";
 
 export function renderParent(ctx) {
   const { state, mount } = ctx;
@@ -93,34 +95,102 @@ export function renderParent(ctx) {
     table,
   ]));
 
-  // Recent mistakes (across topics, newest first)
-  const mistakes = [];
-  for (const t of TOPICS) {
-    for (const m of ensureTopic(state, t.id).recentMistakes || []) {
-      mistakes.push({ topic: t.name, ...m });
-    }
-  }
-  mistakes.sort((x, y) => y.at - x.at);
-  const mlist = h("div", { class: "mistake-list" });
-  if (!mistakes.length) {
-    mlist.appendChild(h("p", { class: "muted", text: "No mistakes recorded yet." }));
+  // Top error patterns — the misconceptions that recur most
+  const mc = state.misconceptionCounts || {};
+  const patterns = Object.entries(mc)
+    .filter(([id, c]) => id && id !== "near_miss" && c > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  const plist = h("div", { class: "mistake-list" });
+  if (!patterns.length) {
+    plist.appendChild(
+      h("p", { class: "muted", text: "No recurring error patterns yet." })
+    );
   } else {
-    for (const m of mistakes.slice(0, 15)) {
-      mlist.appendChild(
+    for (const [mid, count] of patterns) {
+      const tid = topicForMisconception(state, mid);
+      const area = tid ? topicById(tid)?.area : null;
+      const fx = getFixit(mid, area);
+      const label =
+        (fx && fx.title) || (tid && topicById(tid)?.name) || "Repeated slip";
+      plist.appendChild(
         h("div", {}, [
-          h("b", { text: m.topic + " (L" + m.level + "): " }),
+          h("b", { text: `${count}× ` }),
           h("span", {
-            text: `chose “${m.chosenText ?? "?"}”, correct “${m.correctText ?? "?"}”`,
+            text: label + (tid ? ` · ${topicById(tid)?.name || tid}` : ""),
           }),
         ])
       );
     }
   }
-  mount.appendChild(h("div", { class: "card" }, [
-    h("h2", { text: "Recent mistakes" }),
-    h("p", { class: "muted", text: "Use these to spot which methods to revisit together." }),
-    mlist,
-  ]));
+  mount.appendChild(
+    h("div", { class: "card" }, [
+      h("h2", { text: "Top error patterns" }),
+      h("p", {
+        class: "muted",
+        text: "The methods to revisit together. The Review page turns the biggest one into a quick fix-it.",
+      }),
+      plist,
+    ])
+  );
+
+  // Recent mistakes — the persistent cross-topic log (practice + mock +
+  // review), newest first, paginated.
+  const log = (state.mistakeLog || [])
+    .slice()
+    .sort((a, b) => (b.at || 0) - (a.at || 0));
+  const card = h("div", { class: "card" });
+  let expanded = false;
+  function fillLog() {
+    clear(card);
+    card.appendChild(h("h2", { text: "Recent mistakes" }));
+    card.appendChild(
+      h("p", {
+        class: "muted",
+        text: `${log.length} recorded. Source is shown so you can tell practice from mock and review.`,
+      })
+    );
+    const list = h("div", { class: "mistake-list" });
+    if (!log.length) {
+      list.appendChild(
+        h("p", { class: "muted", text: "No mistakes recorded yet." })
+      );
+    } else {
+      const shown = expanded ? log : log.slice(0, 20);
+      for (const m of shown) {
+        const tn = topicById(m.topicId)?.name || m.topicId;
+        list.appendChild(
+          h("div", {}, [
+            h("b", { text: `${tn} (L${m.level}) ` }),
+            h("span", {
+              class: "badge " + (m.source === "mock" ? "strong" : m.source === "review" ? "new" : "learning"),
+              text: m.source || "practice",
+            }),
+            h("span", {
+              text: ` chose “${m.chosenText ?? "?"}”, correct “${
+                m.correctText ?? "?"
+              }”`,
+            }),
+          ])
+        );
+      }
+    }
+    card.appendChild(list);
+    if (log.length > 20) {
+      card.appendChild(
+        button(
+          expanded ? "Show fewer" : `Show all (${log.length})`,
+          () => {
+            expanded = !expanded;
+            fillLog();
+          },
+          "btn secondary"
+        )
+      );
+    }
+  }
+  fillLog();
+  mount.appendChild(card);
 
   // Data controls
   mount.appendChild(

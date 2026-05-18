@@ -79,11 +79,15 @@ export function recordResult(state, topicId, info) {
   const ts = ensureTopic(state, topicId);
   const correct = !!info.correct;
 
+  const dt = Math.max(0, info.timeMs || 0);
   ts.attempts += 1;
   ts.seenCount += 1;
   ts.lastSeenAt = Date.now();
-  ts.timeMs += Math.max(0, info.timeMs || 0);
+  ts.timeMs += dt;
+  pushPace(ts, dt, info.level, info.source === "mock" ? "mock" : "practice");
   state.global.totalAnswered += 1;
+  if (typeof state.global.totalTimeMs === "number")
+    state.global.totalTimeMs += dt;
   state.lastTopicId = topicId;
 
   if (correct) {

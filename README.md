@@ -38,9 +38,14 @@ child's name on the Parent page to personalise it).
   *with fresh numbers* so the child relearns the method, not a memorised
   answer. When one misconception keeps recurring, a targeted **fix-it
   mini-lesson + 5-question drill** is offered.
-- **Parent dashboard**: set the child's name, see per-topic level, accuracy,
-  time on task, **top error patterns**, the full mistake log (practice /
-  mock / review), and export/import/reset progress.
+- **Readiness & speed analytics**: an *explainable* readiness band per topic
+  and overall (mastery + accuracy + level + pace, gated by attempts so luck
+  can't read "Exam-ready"), tuned to a parent-picked **target board
+  (GL / CEM / ISEB / CSSE)**, plus **"accurate but slow"** vs **"fast but
+  careless"** fluency flags from per-question pace.
+- **Parent dashboard**: set the child's name and target board, see per-topic
+  level, accuracy, readiness, pace, time on task, **top error patterns**, the
+  full mistake log (practice / mock / review), and export/import/reset.
 
 ## Run it locally
 
@@ -92,8 +97,9 @@ answers, unique multiple-choice options, deterministic from a seed), the
 adaptive engine's promotion/demotion/mastery rules, the **v3→v4 migration**
 (existing progress is preserved), **mock mode** (seed reproducibility and that
 a mock never moves the ladder), **smart review** (Leitner promotion/demotion,
-misconception aggregation, fresh same-template re-draw), and the curated
-schema.
+misconception aggregation, fresh same-template re-draw), **analytics**
+(quantiles, pace-flag boundaries, monotonic readiness, board reweighting),
+and the curated schema.
 
 ## Tweaking it
 
@@ -114,7 +120,7 @@ Plain HTML + CSS + ES modules, no framework:
 ```
 index.html · style.css · .nojekyll
 js/  rng · format · store · topics · engine · questionFactory · curated ·
-     review · fixits · main
+     review · fixits · analytics · boards · main
 js/persistence/  adapter · localAdapter   (one async surface; cloud-sync ready)
 js/generators/  _shared + 12 topic modules + index
 js/ui/  router · components · screenHome · screenQuiz · screenMock ·
@@ -134,8 +140,8 @@ adds optional cross-device sync with **no screen changes**.
   persistence adapter (cloud-sync ready).
 - **Phase 2 — ✅ shipped**: smart review (Leitner spaced repetition of the
   child's own mistakes) + auto-detected recurring-error fix-it lessons.
-- **Phase 3 — Readiness & speed analytics**: an explainable readiness band
-  tuned to a target board (GL/CEM/ISEB/CSSE) and "accurate but too slow"
+- **Phase 3 — ✅ shipped**: explainable readiness band tuned to a target
+  board (GL/CEM/ISEB/CSSE) + "accurate but slow" / "fast but careless"
   fluency flags.
 - **Phase 4 — More subjects + engagement**: Verbal & Non-Verbal Reasoning and
   auto-markable English, plus streaks, daily goals and printable worksheets.

@@ -6,5 +6,6 @@ import "./engine.test.js";
 import "./migration.test.js";
 import "./mock.test.js";
 import "./review.test.js";
+import "./analytics.test.js";
 import { report } from "./harness.js";
 report();

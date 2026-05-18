@@ -16,15 +16,10 @@ import {
   activeSubjects,
 } from "../topics.js";
 import { randomId } from "../store.js";
+import { scoreBand } from "../analytics.js";
 
 const LENGTHS = [10, 20, 30];
 let mockTimer = null; // module-level so a stale timer is always cleared
-
-function band(pct) {
-  if (pct >= 0.8) return { label: "Exam-ready", cls: "good" };
-  if (pct >= 0.6) return { label: "On track", cls: "ok" };
-  return { label: "Keep practising", cls: "bad" };
-}
 
 export function renderMock(ctx, params) {
   const { state, mount } = ctx;
@@ -366,7 +361,7 @@ export function renderMock(ctx, params) {
       if (r.correct) s.correct += 1;
     }
     const durationMs = recItems.reduce((a, r) => a + (r.timeMs || 0), 0);
-    const b = band(scoreTotal ? scoreCorrect / scoreTotal : 0);
+    const b = scoreBand(scoreTotal ? scoreCorrect / scoreTotal : 0);
 
     const record = {
       id: randomId(),

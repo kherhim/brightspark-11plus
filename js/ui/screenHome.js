@@ -1,5 +1,6 @@
 import { h, button, progressBar, clear } from "./components.js";
 import { TOPICS } from "../topics.js";
+import { overallReadiness, band } from "../analytics.js";
 
 export function renderHome(ctx) {
   const { state, mount } = ctx;
@@ -11,6 +12,9 @@ export function renderHome(ctx) {
   const accuracy = g.totalAnswered
     ? Math.round((g.totalCorrect / g.totalAnswered) * 100)
     : 0;
+  const board = (state.profile && state.profile.board) || null;
+  const readiness = overallReadiness(state, board);
+  const rb = band(readiness);
 
   mount.appendChild(
     h("div", { class: "card center" }, [
@@ -19,6 +23,13 @@ export function renderHome(ctx) {
         class: "muted",
         text: "Practice maths for your senior school entrance exam. The questions get harder as you get better — and explain everything when you go wrong.",
       }),
+      g.totalAnswered
+        ? h("p", {
+            html: `Overall readiness: <b>${rb.label}</b> · ${Math.round(
+              readiness * 100
+            )}%`,
+          })
+        : null,
       progressBar(
         mastered / TOPICS.length,
         `${mastered} of ${TOPICS.length} topics mastered`

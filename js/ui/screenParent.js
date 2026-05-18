@@ -1,10 +1,26 @@
-import { h, button, levelDots, masteryBadge, clear } from "./components.js";
+import {
+  h,
+  button,
+  levelDots,
+  masteryBadge,
+  progressBar,
+  clear,
+} from "./components.js";
 import { TOPICS, topicById } from "../topics.js";
 import { ensureTopic, exportJSON, importJSON, resetState } from "../store.js";
 import { fmtDuration } from "../format.js";
 import { countForms } from "../questionFactory.js";
 import { topicForMisconception } from "../review.js";
 import { getFixit } from "../fixits.js";
+import {
+  overallReadiness,
+  topicReadiness,
+  paceStats,
+  band,
+  explainTopic,
+  MIN_PACE_SAMPLES,
+} from "../analytics.js";
+import { BOARD_LIST, boardName } from "../boards.js";
 
 export function renderParent(ctx) {
   const { state, mount } = ctx;
@@ -63,6 +79,83 @@ export function renderParent(ctx) {
         text: "Optional. Set the child's first name to personalise the greeting and the mock report. It is stored on this device only.",
       }),
       h("div", { class: "numeric-entry" }, [nameInput]),
+    ])
+  );
+
+  // Readiness & speed (board-weighted, explainable)
+  const board = (state.profile && state.profile.board) || null;
+  const overall = overallReadiness(state, board);
+  const ob = band(overall);
+  const boardChoices = [{ id: null, name: "General 11+" }].concat(BOARD_LIST);
+  const boardRow = h(
+    "div",
+    { class: "btn-row" },
+    boardChoices.map((c) =>
+      button(
+        c.name,
+        () => {
+          state.profile = state.profile || {};
+          state.profile.board = c.id;
+          ctx.save();
+          ctx.rerender();
+        },
+        "btn " + ((board || null) === c.id ? "" : "secondary")
+      )
+    )
+  );
+
+  const rTable = h("table", { class: "dash" });
+  rTable.appendChild(
+    h("tr", {}, [
+      h("th", { text: "Topic" }),
+      h("th", { text: "Readiness" }),
+      h("th", { text: "Pace" }),
+    ])
+  );
+  for (const t of TOPICS) {
+    const ts = ensureTopic(state, t.id);
+    const r = topicReadiness(ts, board);
+    const tb = band(r);
+    const ps = paceStats(ts, board);
+    const paceTxt = !ts.attempts
+      ? "—"
+      : ps.enough
+      ? ps.flag.label
+      : `collecting (${ps.n}/${MIN_PACE_SAMPLES})`;
+    rTable.appendChild(
+      h("tr", { title: explainTopic(ts, board) }, [
+        h("td", { text: t.name }),
+        h("td", {}, [
+          h("span", {
+            class: "badge " + tb.badge,
+            text: ts.attempts ? tb.label : "Not started",
+          }),
+        ]),
+        h("td", {
+          class:
+            ps.enough && ps.flag.key !== "balanced" ? "pace-flag" : "muted",
+          text: paceTxt,
+        }),
+      ])
+    );
+  }
+  mount.appendChild(
+    h("div", { class: "card" }, [
+      h("h2", { text: "Readiness" }),
+      h("p", {
+        class: "muted",
+        html: `Target board: <b>${boardName(
+          board
+        )}</b>. Readiness blends mastery, accuracy, level and pace, and only counts once there are enough attempts — so a couple of lucky answers can't read “Exam-ready”. Hover a row for the reason.`,
+      }),
+      boardRow,
+      h("div", { style: "margin:14px 0 6px" }, [
+        progressBar(
+          overall,
+          `${Math.round(overall * 100)}% · ${ob.label}`
+        ),
+      ]),
+      rTable,
     ])
   );
 

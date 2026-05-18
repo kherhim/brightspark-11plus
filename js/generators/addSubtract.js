@@ -58,7 +58,7 @@ const templates = [
     const paid = Math.ceil(total) + rng.int(0, 4);
     const change = round(paid - total, 2);
     return numeric({ topicId: "add-subtract", level,
-      promptHTML: `Syon buys <b>${qty}</b> pens at <b>£${item.toFixed(2)}</b> each and a ruler for <b>£${extra.toFixed(2)}</b>. He pays with <b>£${paid}</b>. How much change (£)?`,
+      promptHTML: `Omar buys <b>${qty}</b> pens at <b>£${item.toFixed(2)}</b> each and a ruler for <b>£${extra.toFixed(2)}</b>. He pays with <b>£${paid}</b>. How much change (£)?`,
       value: change, tolerance: 0.005, accept: [change.toFixed(2), `£${change.toFixed(2)}`],
       explanation: "Total the cost (price × quantity + extra), then subtract from what was paid.",
       workedSteps: [`${qty} × £${item.toFixed(2)} = £${(item * qty).toFixed(2)}`, `+ £${extra.toFixed(2)} = £${total.toFixed(2)}`, `£${paid} − £${total.toFixed(2)} = £${change.toFixed(2)}`],

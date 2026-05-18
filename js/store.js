@@ -21,7 +21,7 @@ let storageOk = true;
 
 function ls() {
   try {
-    const t = "__syon_probe__";
+    const t = "__bs_probe__";
     window.localStorage.setItem(t, "1");
     window.localStorage.removeItem(t);
     return window.localStorage;
@@ -67,7 +67,7 @@ function freshTopic() {
 }
 
 function freshProfile() {
-  return { board: null, dailyGoal: 10 };
+  return { board: null, dailyGoal: 10, childName: "" };
 }
 
 function freshStreaks() {
@@ -112,6 +112,7 @@ function ensureV4Shape(state) {
   state.profile = state.profile || freshProfile();
   if (typeof state.profile.board === "undefined") state.profile.board = null;
   if (typeof state.profile.dailyGoal !== "number") state.profile.dailyGoal = 10;
+  if (typeof state.profile.childName !== "string") state.profile.childName = "";
   state.streaks = state.streaks || freshStreaks();
   state.badges = state.badges || {};
   state.mistakeLog = Array.isArray(state.mistakeLog) ? state.mistakeLog : [];

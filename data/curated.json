@@ -17,7 +17,7 @@
   },
   {
     "id": "cur-003", "topicId": "fractions", "level": 5, "type": "numeric",
-    "promptHTML": "Syon spends 1/3 of his money on a book and 1/4 of what is left on a snack. He started with £24. How much money (£) does he have left?",
+    "promptHTML": "Noah spends 1/3 of his money on a book and 1/4 of what is left on a snack. He started with £24. How much money (£) does he have left?",
     "answer": { "value": 12, "tolerance": 0, "accept": ["12", "£12"] },
     "explanation": "Work step by step: take the book cost off first, then a quarter of the remainder.",
     "workedSteps": ["Book: 1/3 of £24 = £8 → £16 left", "Snack: 1/4 of £16 = £4 → £12 left"],
@@ -159,7 +159,7 @@
   },
   {
     "id": "cur-017", "topicId": "statistics", "level": 5, "type": "numeric",
-    "promptHTML": "Syon's test scores are 7, 9, 8, 6 and 10. He takes a sixth test. What must he score so his mean is exactly 8?",
+    "promptHTML": "Leo's test scores are 7, 9, 8, 6 and 10. He takes a sixth test. What must he score so his mean is exactly 8?",
     "answer": { "value": 8, "tolerance": 0, "accept": ["8"] },
     "explanation": "A mean of 8 over 6 tests needs a total of 48. Subtract the first five.",
     "workedSteps": ["Needed total = 8 × 6 = 48", "First five total = 40", "48 − 40 = 8"],
@@ -375,7 +375,7 @@
   },
   {
     "id": "cur-039", "topicId": "percentages", "level": 5, "type": "numeric",
-    "promptHTML": "Syon scored 18 out of 24 in a test. What percentage is that?",
+    "promptHTML": "Aisha scored 18 out of 24 in a test. What percentage is that?",
     "answer": { "value": 75, "tolerance": 0, "accept": ["75", "75%"] },
     "explanation": "Percentage = (score ÷ total) × 100.",
     "workedSteps": ["18 ÷ 24 = 0.75", "0.75 × 100 = 75%"],
@@ -399,7 +399,7 @@
   },
   {
     "id": "cur-042", "topicId": "measurement", "level": 3, "type": "numeric",
-    "promptHTML": "A piece of string is 3 m long. Syon cuts off 145 cm. How many centimetres of string are left?",
+    "promptHTML": "A piece of string is 3 m long. Tom cuts off 145 cm. How many centimetres of string are left?",
     "answer": { "value": 155, "tolerance": 0, "accept": ["155", "155cm"] },
     "explanation": "Convert to the same unit (cm) first, then subtract.",
     "workedSteps": ["3 m = 300 cm", "300 − 145 = 155 cm"],
@@ -497,7 +497,7 @@
   },
   {
     "id": "cur-053", "topicId": "fractions", "level": 6, "type": "numeric",
-    "promptHTML": "Syon spends 2/5 of his money, then 1/3 of what is left. He now has £24. How much (£) did he start with?",
+    "promptHTML": "Ravi spends 2/5 of his money, then 1/3 of what is left. He now has £24. How much (£) did he start with?",
     "answer": { "value": 60, "tolerance": 0, "accept": ["60", "£60"] },
     "explanation": "After 2/5 spent, 3/5 remains. Spending 1/3 of that leaves 2/3 of 3/5 = 2/5 of the original.",
     "workedSteps": ["Left = 2/3 × 3/5 = 2/5 of start", "2/5 of start = £24", "Start = £60"],

@@ -28,6 +28,7 @@ function band(pct) {
 
 export function renderMock(ctx, params) {
   const { state, mount } = ctx;
+  const who = (state.profile && state.profile.childName || "").trim();
   if (mockTimer) {
     clearInterval(mockTimer);
     mockTimer = null;
@@ -112,8 +113,9 @@ export function renderMock(ctx, params) {
         h("h2", { text: "Mock exam" }),
         h("p", {
           class: "muted",
-          text:
-            "A timed paper at Syon's current level. No hints or answers until the end — then a full mark-up with worked solutions. A mock informs progress but never changes practice difficulty.",
+          text: `A timed paper at ${
+            who ? who + "’s" : "the"
+          } current working level. No hints or answers until the end — then a full mark-up with worked solutions. A mock informs progress but never changes practice difficulty.`,
         }),
         h("h3", { text: "Subject" }),
         subjRow,
@@ -402,7 +404,9 @@ export function renderMock(ctx, params) {
             class: "muted",
             text: `Time taken ${fmtDuration(record.durationMs)}${
               record.timed ? "" : " (untimed)"
-            }. This result informs Syon's readiness but did not change any practice levels.`,
+            }. This result informs ${
+              who ? who + "’s" : "the child’s"
+            } readiness but did not change any practice levels.`,
           }),
         ]),
         h("h3", { text: "By topic" }),
@@ -453,7 +457,7 @@ export function renderMock(ctx, params) {
         h("p", {
           class: "muted",
           text: r.chosenText
-            ? `Syon answered: ${r.chosenText}`
+            ? `${who ? who + " answered" : "Answer given"}: ${r.chosenText}`
             : "Not answered.",
         }),
       ]);

@@ -6,7 +6,7 @@
 const FALLBACK = [
   {
     id: "fb-1", topicId: "fractions", level: 5, type: "numeric",
-    promptHTML: "Syon spends 1/3 of £24 on a book, then 1/4 of what is left on a snack. How much (£) is left?",
+    promptHTML: "Sam spends 1/3 of £24 on a book, then 1/4 of what is left on a snack. How much (£) is left?",
     answer: { value: 12, tolerance: 0, accept: ["12", "£12"] },
     explanation: "Take the book cost off first, then a quarter of the remainder.",
     workedSteps: ["1/3 of 24 = 8 → 16 left", "1/4 of 16 = 4 → 12 left"],

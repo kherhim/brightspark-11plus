@@ -205,7 +205,7 @@ const templates = [
     const spent2 = rest / b2;
     const left = rest - spent2;
     return q({ rng, topicId: "fractions", level,
-      promptHTML: `Syon has <b>£${N}</b>. He spends <b>1/${b1}</b> of it, then <b>1/${b2}</b> of what is left. How much (£) remains?`,
+      promptHTML: `Ben has <b>£${N}</b>. He spends <b>1/${b1}</b> of it, then <b>1/${b2}</b> of what is left. How much (£) remains?`,
       correctText: String(left),
       distractors: [
         { text: String(rest), id: "fw_stop", fb: "Take the second fraction off the *remaining* money too." },

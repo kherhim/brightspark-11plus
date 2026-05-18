@@ -5,6 +5,7 @@ export function renderHome(ctx) {
   const { state, mount } = ctx;
   clear(mount);
 
+  const who = (state.profile && state.profile.childName || "").trim();
   const mastered = TOPICS.filter((t) => state.topics[t.id]?.mastered).length;
   const g = state.global;
   const accuracy = g.totalAnswered
@@ -13,7 +14,7 @@ export function renderHome(ctx) {
 
   mount.appendChild(
     h("div", { class: "card center" }, [
-      h("h1", { text: "Hi Syon! 👋" }),
+      h("h1", { text: who ? `Hi ${who}! 👋` : "Hi there! 👋" }),
       h("p", {
         class: "muted",
         text: "Practice maths for your senior school entrance exam. The questions get harder as you get better — and explain everything when you go wrong.",

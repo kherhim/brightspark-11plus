@@ -8,6 +8,7 @@ export function renderParent(ctx) {
   const { state, mount } = ctx;
   clear(mount);
 
+  const who = (state.profile && state.profile.childName || "").trim();
   const g = state.global;
   const acc = g.totalAnswered
     ? Math.round((g.totalCorrect / g.totalAnswered) * 100)
@@ -30,6 +31,36 @@ export function renderParent(ctx) {
         st(acc + "%", "Accuracy"),
         st(fmtDuration(totalTime), "Time on task"),
       ]),
+    ])
+  );
+
+  // Who is practising — sets the personalised name
+  const nameInput = h("input", {
+    type: "text",
+    value: who,
+    placeholder: "e.g. Aanya",
+    "aria-label": "Child's first name",
+    maxlength: "40",
+  });
+  nameInput.addEventListener("change", () => {
+    state.profile = state.profile || {};
+    state.profile.childName = nameInput.value.trim().slice(0, 40);
+    ctx.save();
+    ctx.setNotice(
+      state.profile.childName
+        ? `Saved — greetings and reports will say “${state.profile.childName}”.`
+        : "Name cleared — the app will use a neutral greeting."
+    );
+    ctx.rerender();
+  });
+  mount.appendChild(
+    h("div", { class: "card" }, [
+      h("h2", { text: "Who is practising?" }),
+      h("p", {
+        class: "muted",
+        text: "Optional. Set the child's first name to personalise the greeting and the mock report. It is stored on this device only.",
+      }),
+      h("div", { class: "numeric-entry" }, [nameInput]),
     ])
   );
 
@@ -119,7 +150,7 @@ function doExport(state) {
   const blob = new Blob([exportJSON(state)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `syon-11plus-progress-${new Date()
+  a.download = `brightspark-11plus-progress-${new Date()
     .toISOString()
     .slice(0, 10)}.json`;
   a.click();
@@ -150,9 +181,13 @@ function doImport(ctx) {
 }
 
 function doReset(ctx) {
+  const who =
+    (ctx.state.profile && ctx.state.profile.childName || "").trim();
   if (
     !confirm(
-      "Reset ALL of Syon's progress? This cannot be undone. Consider exporting first."
+      `Reset ALL of ${
+        who ? who + "’s" : "this child’s"
+      } progress? This cannot be undone. Consider exporting first.`
     )
   )
     return;

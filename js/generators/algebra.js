@@ -136,7 +136,7 @@ const templates = [
     const each = rng.int(3, 9), extra = rng.int(2, 20), x = rng.int(4, 15);
     const total = each * x + extra;
     return numeric({ topicId: "algebra", level,
-      promptHTML: `Syon buys <b>x</b> books at <b>£${each}</b> each plus a <b>£${extra}</b> bag. He spends <b>£${total}</b> in total. How many books did he buy?`,
+      promptHTML: `Jack buys <b>x</b> books at <b>£${each}</b> each plus a <b>£${extra}</b> bag. He spends <b>£${total}</b> in total. How many books did he buy?`,
       value: x,
       explanation: `Form the equation ${each}x + ${extra} = ${total}, then solve it.`,
       workedSteps: [`${each}x + ${extra} = ${total}`, `${each}x = ${total - extra}`, `x = ${x}`],

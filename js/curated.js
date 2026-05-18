@@ -109,6 +109,13 @@ export function getCurated(topicId, level, rng) {
   return normalise(rng.pick(pool), rng);
 }
 
+// Reproduce a specific curated question from its raw id (the part after
+// "curated:"). Used by getQuestionById for mock reports and review.
+export function curatedById(rawId, rng) {
+  const item = (CURATED || []).find((c) => c.id === rawId);
+  return item ? normalise(item, rng) : null;
+}
+
 export function curatedCount() {
   return (CURATED || []).length;
 }

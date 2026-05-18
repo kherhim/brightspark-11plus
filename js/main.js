@@ -1,12 +1,13 @@
 // App bootstrap: load data + saved progress, wire the router and the
 // shared context object the screens use.
 
-import { loadState, saveState, storageAvailable } from "./store.js";
+import { activeAdapter } from "./persistence/adapter.js";
 import { loadCurated } from "./curated.js";
 import { startRouter, parseHash, navigate } from "./ui/router.js";
 import { renderHome } from "./ui/screenHome.js";
 import { renderTopics } from "./ui/screenTopics.js";
 import { renderQuiz } from "./ui/screenQuiz.js";
+import { renderMock } from "./ui/screenMock.js";
 import { renderParent } from "./ui/screenParent.js";
 
 const mount = document.getElementById("app");
@@ -17,7 +18,7 @@ const ctx = {
   mount,
   navigate,
   save() {
-    saveState(this.state);
+    activeAdapter.save(this.state);
   },
   replaceState(s) {
     this.state = s;
@@ -43,6 +44,7 @@ const SCREENS = {
   home: renderHome,
   topics: renderTopics,
   quiz: renderQuiz,
+  mock: renderMock,
   parent: renderParent,
 };
 
@@ -65,8 +67,8 @@ function route({ name, params }) {
 
 async function boot() {
   await loadCurated();
-  ctx.state = loadState();
-  if (!storageAvailable()) {
+  ctx.state = await activeAdapter.load();
+  if (!activeAdapter.isAvailable()) {
     ctx.setNotice(
       "Heads up: this browser won't save progress (private mode or storage blocked). You can still practise, and export progress from the Parent page."
     );

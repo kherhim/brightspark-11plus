@@ -6,6 +6,41 @@ import { getQuestion } from "../questionFactory.js";
 import { makeRng, freshSeed } from "../rng.js";
 import { checkNumeric } from "../format.js";
 
+// The canonical correct-answer text for any question instance.
+export function correctAnswerText(q) {
+  return q.type === "mcq"
+    ? q.choices.find((c) => c.correct).text
+    : String(q.answer.value);
+}
+
+// The teaching block for a question: correct answer, explanation, worked
+// solution and key idea. Shared by the quiz feedback and the mock report
+// so both show identical solutions. Returns an array of DOM nodes.
+export function renderSolution(q, correctText) {
+  if (correctText == null) correctText = correctAnswerText(q);
+  const nodes = [
+    h("p", { html: `The correct answer is <b>${correctText}</b>.` }),
+  ];
+  if (q.explanation) nodes.push(h("p", { text: q.explanation }));
+  if (q.workedSteps && q.workedSteps.length) {
+    nodes.push(
+      h("div", {}, [
+        h("b", { text: "Worked solution:" }),
+        h(
+          "ol",
+          { class: "steps" },
+          q.workedSteps.map((s) => h("li", { html: s }))
+        ),
+      ])
+    );
+  }
+  if (q.keyConcept)
+    nodes.push(
+      h("div", { class: "concept", html: "💡 Key idea: " + q.keyConcept })
+    );
+  return nodes;
+}
+
 export function renderQuiz(ctx, params) {
   const { state, mount } = ctx;
   const practiceTopic = params && params[0] ? params[0] : null;
@@ -129,10 +164,7 @@ export function renderQuiz(ctx, params) {
         .forEach((n) => n.setAttribute("disabled", "true"));
     }
 
-    const correctText =
-      q.type === "mcq"
-        ? q.choices.find((c) => c.correct).text
-        : String(q.answer.value);
+    const correctText = correctAnswerText(q);
 
     if (current.graded) {
       recordResult(state, current.topicId, {
@@ -165,26 +197,7 @@ export function renderQuiz(ctx, params) {
           ? q.misconceptions[chosen.misconceptionId]
           : null;
       if (why) fb.appendChild(h("p", { class: "why", text: why }));
-      fb.appendChild(
-        h("p", { html: `The correct answer is <b>${correctText}</b>.` })
-      );
-      if (q.explanation) fb.appendChild(h("p", { text: q.explanation }));
-      if (q.workedSteps && q.workedSteps.length) {
-        fb.appendChild(
-          h("div", {}, [
-            h("b", { text: "Worked solution:" }),
-            h(
-              "ol",
-              { class: "steps" },
-              q.workedSteps.map((s) => h("li", { html: s }))
-            ),
-          ])
-        );
-      }
-      if (q.keyConcept)
-        fb.appendChild(
-          h("div", { class: "concept", html: "💡 Key idea: " + q.keyConcept })
-        );
+      renderSolution(q, correctText).forEach((n) => fb.appendChild(n));
     }
 
     const row = h("div", { class: "btn-row" });

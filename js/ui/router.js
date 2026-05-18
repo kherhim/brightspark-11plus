@@ -3,6 +3,8 @@
 //   #/topics            topic grid (pick a topic to drill)
 //   #/quiz              adaptive practice (engine chooses topics)
 //   #/quiz/<topicId>    practice one topic
+//   #/mock              timed mock-exam setup
+//   #/mock/<subject>    mock exam for a subject (deep link)
 //   #/parent            parent dashboard
 
 export function parseHash() {

@@ -24,6 +24,11 @@ on the device.
 - **Teaches when he slips**: a wrong answer shows *why* that specific choice was
   tempting (common misconception), the full worked solution, and the key idea —
   plus a one-tap "try an easier one".
+- **Timed mock exams**: a fixed-length (10/20/30), mixed-topic paper at
+  Syon's current level with a countdown and **no feedback until the end** —
+  then a marked report (score, an 11+ readiness band, per-topic breakdown)
+  with every question worked through. A mock **informs** progress but can
+  **never move the practice difficulty** up or down.
 - **Parent dashboard**: per-topic level, accuracy, time on task, recent
   mistakes, and progress export/import/reset.
 
@@ -65,6 +70,13 @@ After a minute the app is live at
 > Progress is stored per-browser. To move it between devices, use **Export
 > progress** on the Parent page and **Import** it on the other device.
 
+> **Updating safely:** the storage schema is versioned (currently v4). When
+> the app is updated, existing progress is **migrated forward field-by-field,
+> never wiped** — Syon keeps his levels, accuracy and mistake history.
+> (Implementation note: the localStorage key string is intentionally still
+> `syon11plus.v3`; it is just the slot name and renaming it would orphan a
+> child's existing save. The real version is `state.schemaVersion`.)
+
 ## Run the tests
 
 - **In a browser** (full suite, incl. curated bank): start the server above and
@@ -94,8 +106,15 @@ Plain HTML + CSS + ES modules, no framework:
 ```
 index.html · style.css · .nojekyll
 js/  rng · format · store · topics · engine · questionFactory · curated · main
+js/persistence/  adapter · localAdapter   (one async surface; cloud-sync ready)
 js/generators/  _shared + 12 topic modules + index
-js/ui/  router · components · screenHome · screenQuiz · screenTopics · screenParent
+js/ui/  router · components · screenHome · screenQuiz · screenMock ·
+        screenTopics · screenParent
 data/curated.json
-tests/  test.html · harness · *.test.js · run-node.mjs
+tests/  test.html · harness · *.test.js (incl. migration, mock) · run-node.mjs
 ```
+
+The app never touches `localStorage` directly — every screen goes through
+`js/persistence/adapter.js`. Swapping `activeAdapter` for a future
+`cloudAdapter.js` (same five methods, last-writer-wins on `state.updatedAt`)
+adds optional cross-device sync with **no screen changes**.

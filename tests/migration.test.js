@@ -84,6 +84,31 @@ test("adds v4 fields without losing data", () => {
   );
 });
 
+test("backfills the additive Phase-4A activity counter (no schema bump)", () => {
+  // An OLD v4 export from before Phase 4A has no `state.activity`.
+  const old = migrate(v3()); // a valid v4 shape...
+  delete old.activity; // ...as it would have looked pre-Phase-4A
+  assertEq(old.schemaVersion, SCHEMA_VERSION, "still schema v4");
+  const m = migrate(JSON.parse(JSON.stringify(old)));
+  assertEq(m.schemaVersion, SCHEMA_VERSION, "NO schema bump");
+  assert(
+    m.activity && typeof m.activity === "object",
+    "activity backfilled"
+  );
+  assertEq(m.activity.date, null, "activity zeroed");
+  assertEq(m.activity.answered, 0, "answered zeroed");
+  // Existing progress is untouched by the additive field.
+  assertEq(m.topics.fractions.level, 5, "level preserved");
+  assertEq(m.mistakeLog.length, 2, "mistake log preserved");
+});
+
+test("an exported file with activity round-trips through import", () => {
+  const exported = JSON.stringify(migrate(v3()));
+  const m = importJSON(exported);
+  assert(m.activity && typeof m.activity === "object", "activity present");
+  assertEq(m.topics.fractions.correct, 15, "progress survived");
+});
+
 test("seeds the persistent mistakeLog from the 10-item rings", () => {
   const m = migrate(v3());
   assert(Array.isArray(m.mistakeLog), "mistakeLog is an array");

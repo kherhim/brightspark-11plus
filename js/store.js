@@ -74,6 +74,10 @@ function freshStreaks() {
   return { current: 0, longest: 0, lastActiveDay: null };
 }
 
+function freshActivity() {
+  return { date: null, answered: 0, correct: 0 };
+}
+
 export function freshState() {
   const topics = {};
   for (const t of TOPICS) topics[t.id] = freshTopic();
@@ -85,6 +89,7 @@ export function freshState() {
     global: { totalAnswered: 0, totalCorrect: 0, sessionCount: 0, totalTimeMs: 0 },
     profile: freshProfile(),
     streaks: freshStreaks(),
+    activity: freshActivity(), // today's local-day counters (Phase 4A)
     badges: {}, // badgeId -> earnedAt (Phase 4)
     mistakeLog: [], // persistent, capped (Phase 2)
     leitner: { boxes: {} }, // spaced-repetition queue (Phase 2)
@@ -115,6 +120,8 @@ function ensureV4Shape(state) {
   if (typeof state.profile.dailyGoal !== "number") state.profile.dailyGoal = 10;
   if (typeof state.profile.childName !== "string") state.profile.childName = "";
   state.streaks = state.streaks || freshStreaks();
+  if (!state.activity || typeof state.activity !== "object")
+    state.activity = freshActivity(); // additive (Phase 4A) — NO schema bump
   state.badges = state.badges || {};
   state.mistakeLog = Array.isArray(state.mistakeLog) ? state.mistakeLog : [];
   state.leitner =

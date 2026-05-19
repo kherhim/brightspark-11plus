@@ -5,13 +5,9 @@ import { selectTopic, presentationLevel, recordResult } from "../engine.js";
 import { getQuestion } from "../questionFactory.js";
 import { makeRng, freshSeed } from "../rng.js";
 import { checkNumeric } from "../format.js";
+import { correctAnswerText } from "../answers.js";
 
-// The canonical correct-answer text for any question instance.
-export function correctAnswerText(q) {
-  return q.type === "mcq"
-    ? q.choices.find((c) => c.correct).text
-    : String(q.answer.value);
-}
+export { correctAnswerText };
 
 // The teaching block for a question: correct answer, explanation, worked
 // solution and key idea. Shared by the quiz feedback and the mock report

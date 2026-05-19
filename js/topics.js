@@ -36,6 +36,48 @@ export const TOPICS = [
     generator: "perimeterAreaVolume", curatedTags: ["perimeter", "area", "volume"] },
   { id: "statistics", name: "Statistics & Data", subject: "maths", area: "Data",
     generator: "statistics", curatedTags: ["statistics", "averages", "data"] },
+
+  // --- Verbal Reasoning (Phase 4A) ---------------------------------------
+  { id: "vr-vocab", name: "Synonyms & Antonyms", subject: "vr", area: "Vocabulary",
+    generator: "vrVocab", curatedTags: ["vr-vocab"] },
+  { id: "vr-analogy", name: "Word Analogies", subject: "vr", area: "Relationships",
+    generator: "vrAnalogy", curatedTags: ["vr-analogy"] },
+  { id: "vr-odd", name: "Odd One Out", subject: "vr", area: "Classification",
+    generator: "vrOdd", curatedTags: ["vr-odd"] },
+  { id: "vr-letters", name: "Letter Sequences", subject: "vr", area: "Sequences",
+    generator: "vrLetters", curatedTags: ["vr-letters"] },
+  { id: "vr-codes", name: "Letter & Number Codes", subject: "vr", area: "Codes",
+    generator: "vrCodes", curatedTags: ["vr-codes"] },
+  { id: "vr-logic", name: "Number & Word Logic", subject: "vr", area: "Logic",
+    generator: "vrLogic", curatedTags: ["vr-logic"] },
+  { id: "vr-words", name: "Word Manipulation", subject: "vr", area: "Word Manipulation",
+    generator: "vrWords", curatedTags: ["vr-words"] },
+
+  // --- Non-Verbal Reasoning (Phase 4A) -----------------------------------
+  { id: "nvr-series", name: "Figure Series", subject: "nvr", area: "Sequences",
+    generator: "nvrSeries", curatedTags: ["nvr-series"] },
+  { id: "nvr-matrix", name: "Matrices", subject: "nvr", area: "Matrices",
+    generator: "nvrMatrix", curatedTags: ["nvr-matrix"] },
+  { id: "nvr-odd", name: "Odd One Out", subject: "nvr", area: "Classification",
+    generator: "nvrOdd", curatedTags: ["nvr-odd"] },
+  { id: "nvr-analogy", name: "Figure Analogies", subject: "nvr", area: "Relationships",
+    generator: "nvrAnalogy", curatedTags: ["nvr-analogy"] },
+  { id: "nvr-rotation", name: "Rotation & Reflection", subject: "nvr", area: "Transformations",
+    generator: "nvrRotation", curatedTags: ["nvr-rotation"] },
+
+  // --- English (auto-markable; Phase 4A) ---------------------------------
+  { id: "en-spelling", name: "Spelling", subject: "english", area: "Spelling",
+    generator: "enSpelling", curatedTags: ["en-spelling"] },
+  { id: "en-grammar", name: "Grammar", subject: "english", area: "Grammar",
+    generator: "enGrammar", curatedTags: ["en-grammar"] },
+  { id: "en-punctuation", name: "Punctuation", subject: "english", area: "Punctuation",
+    generator: "enPunctuation", curatedTags: ["en-punctuation"] },
+  { id: "en-vocab", name: "Vocabulary in Context", subject: "english", area: "Vocabulary",
+    generator: "enVocab", curatedTags: ["en-vocab"] },
+  { id: "en-cloze", name: "Cloze (Gap-Fill)", subject: "english", area: "Comprehension",
+    generator: "enCloze", curatedTags: ["en-cloze"] },
+  { id: "en-comprehension", name: "Reading Comprehension", subject: "english", area: "Comprehension",
+    generator: "enComprehension", curatedTags: ["en-comprehension"] },
 ];
 
 export const MAX_LEVEL = 6;

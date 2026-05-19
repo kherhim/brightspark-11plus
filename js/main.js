@@ -10,6 +10,7 @@ import { renderTopics } from "./ui/screenTopics.js";
 import { renderQuiz } from "./ui/screenQuiz.js";
 import { renderMock } from "./ui/screenMock.js";
 import { renderReview } from "./ui/screenReview.js";
+import { renderWorksheet } from "./ui/screenWorksheet.js";
 import { renderParent } from "./ui/screenParent.js";
 
 const mount = document.getElementById("app");
@@ -48,6 +49,7 @@ const SCREENS = {
   quiz: renderQuiz,
   mock: renderMock,
   review: renderReview,
+  worksheet: renderWorksheet,
   parent: renderParent,
 };
 

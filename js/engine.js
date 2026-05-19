@@ -5,6 +5,7 @@
 import { TOPICS, MAX_LEVEL, MIN_LEVEL } from "./topics.js";
 import { ensureTopic } from "./store.js";
 import { enqueueLeitner } from "./review.js";
+import { recordActivity, evaluateBadges } from "./engagement.js";
 
 // --- Tunable constants ----------------------------------------------------
 export const PROMOTE_THRESHOLD = 2; // correct-in-a-row to go up a level
@@ -133,6 +134,11 @@ export function recordResult(state, topicId, info) {
   }
 
   ts.mastered = isMastered(ts);
+
+  // Engagement: a graded practice answer feeds the daily streak/goal and
+  // may earn badges. (Mock answers deliberately do NOT — see below.)
+  recordActivity(state, { correct });
+  evaluateBadges(state);
   return ts;
 }
 
@@ -243,5 +249,10 @@ export function recordMockOutcome(state, record) {
   if (!Array.isArray(state.mockHistory)) state.mockHistory = [];
   state.mockHistory.push(record);
   if (state.mockHistory.length > 20) state.mockHistory.shift();
+
+  // A mock can earn mock/volume badges, but it must NOT touch the daily
+  // streak or goal (consistent with a mock being a muted update that
+  // never moves the practice ladder), so we only evaluate badges here.
+  evaluateBadges(state);
   return record;
 }

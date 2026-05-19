@@ -50,6 +50,65 @@ export function masteryBadge(ts) {
   return h("span", { class: "badge learning", text: "Learning" });
 }
 
+// A small coloured readiness/level pill (reuses the .badge palette).
+export function subjectPill(label, bandObj) {
+  return h("span", {
+    class: "badge " + (bandObj ? bandObj.badge : "new"),
+    text: label,
+  });
+}
+
+// Streak + daily-goal + earned-badges strip. Pure: reads only state.
+export function engagementWidget(state, goalProgress, BADGES) {
+  const gp = goalProgress(state);
+  const streak = (state.streaks && state.streaks.current) || 0;
+  const best = (state.streaks && state.streaks.longest) || 0;
+  const earned = BADGES.filter((b) => state.badges && state.badges[b.id]);
+
+  const badgeRow = h("div", { class: "badge-strip" });
+  if (!earned.length) {
+    badgeRow.appendChild(
+      h("span", { class: "muted", text: "No badges yet — keep practising!" })
+    );
+  } else {
+    for (const b of earned) {
+      badgeRow.appendChild(
+        h("span", {
+          class: "badge-chip",
+          title: `${b.name} — ${b.desc}`,
+          html: `${b.icon} ${b.name}`,
+        })
+      );
+    }
+  }
+
+  return h("div", { class: "card engage" }, [
+    h("div", { class: "engage-top" }, [
+      h("div", { class: "engage-streak" }, [
+        h("div", { class: "flame", text: streak > 0 ? "🔥" : "✨" }),
+        h("div", {}, [
+          h("div", {
+            class: "big",
+            text: streak > 0 ? `${streak}-day streak` : "Start a streak!",
+          }),
+          h("div", {
+            class: "lbl muted",
+            text: best > 0 ? `Best: ${best} days` : "Practise today to begin",
+          }),
+        ]),
+      ]),
+      h("div", { class: "engage-goal" }, [
+        h("div", { class: "lbl muted", text: "Today's goal" }),
+        progressBar(
+          gp.fraction,
+          gp.met ? `Goal done! ${gp.done}/${gp.goal}` : `${gp.done} / ${gp.goal}`
+        ),
+      ]),
+    ]),
+    badgeRow,
+  ]);
+}
+
 export function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
   return node;

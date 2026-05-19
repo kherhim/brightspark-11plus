@@ -6,6 +6,7 @@
 //   #/mock              timed mock-exam setup
 //   #/mock/<subject>    mock exam for a subject (deep link)
 //   #/review            spaced review of past mistakes + fix-it
+//   #/worksheet         printable worksheet generator (+ answer key)
 //   #/parent            parent dashboard
 
 export function parseHash() {

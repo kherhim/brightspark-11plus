@@ -249,8 +249,102 @@ table.dash th { color: var(--muted); font-weight: 700; }
 .stat .big { font-size: 1.6rem; font-weight: 800; color: var(--indigo); }
 .stat .lbl { color: var(--muted); font-size: 0.85rem; }
 
+/* Non-Verbal Reasoning figures */
+.nvr-row {
+  display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  margin: 12px 0;
+}
+.nvr-grid { display: inline-grid; gap: 10px; margin: 12px 0; }
+.nvr-fig { vertical-align: middle; }
+.nvr-op { font-size: 1.6rem; font-weight: 800; color: var(--muted); }
+.choices .nvr-fig { width: 80px; height: 80px; }
+
+/* Reading passage / cloze text inside a question */
+.question .passage {
+  font-weight: 400; font-size: 1.02rem; line-height: 1.6;
+  background: #f8fafc; border-left: 4px solid var(--indigo);
+  padding: 12px 16px; border-radius: 8px; margin-bottom: 14px;
+}
+
+/* Subject grouping */
+.subj-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.subj-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px;
+}
+.subj-head h2 { margin: 0; }
+.subj-chips {
+  display: flex; gap: 8px 16px; flex-wrap: wrap;
+  justify-content: center; margin: 10px 0;
+}
+.subj-chip { font-size: 0.9rem; }
+table.dash tr.subj-row td { background: #f1f5f9; }
+
+/* Engagement widget */
+.engage .engage-top {
+  display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+}
+.engage-streak {
+  display: flex; gap: 14px; align-items: center; flex: 1 1 220px;
+}
+.engage-streak .flame { font-size: 2.4rem; }
+.engage-streak .big { font-size: 1.3rem; font-weight: 800; }
+.engage-goal { flex: 1 1 220px; }
+.engage-goal .lbl { margin-bottom: 6px; }
+.badge-strip {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;
+}
+.badge-chip {
+  background: #eef2ff; color: var(--indigo-dark);
+  border: 1px solid #c7d2fe; border-radius: 999px;
+  padding: 5px 12px; font-size: 0.82rem; font-weight: 700;
+}
+
+/* Worksheets */
+.ws-head { border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 14px; }
+.ws-head h2 { margin: 0 0 4px; }
+.ws-meta { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px; font-size: 0.95rem; }
+.ws-item { margin: 0 0 18px; }
+.ws-q { display: flex; gap: 8px; align-items: baseline; }
+.ws-n { font-weight: 800; }
+.ws-prompt { font-weight: 600; }
+.ws-choices {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px;
+  margin: 8px 0 0 22px;
+}
+.ws-choice { display: flex; gap: 8px; align-items: center; }
+.ws-key {
+  font-weight: 800; border: 1px solid var(--ink);
+  border-radius: 6px; width: 24px; height: 24px;
+  display: grid; place-items: center; flex: none; font-size: 0.85rem;
+}
+.ws-answerline { margin: 10px 0 0 22px; color: var(--muted); }
+.answer-key .ws-key-row { padding: 4px 0; border-bottom: 1px solid var(--line); }
+
 @media (max-width: 560px) {
   .topic-grid { grid-template-columns: 1fr; }
   .stat-grid { grid-template-columns: 1fr; }
+  .ws-choices { grid-template-columns: 1fr; }
   body { font-size: 17px; }
+}
+
+/* Printing: only the worksheet + answer key, on clean white paper. */
+@media print {
+  .app-header, .app-footer, #notice, .no-print { display: none !important; }
+  body { background: #fff; color: #000; font-size: 12pt; }
+  .app { max-width: none; margin: 0; padding: 0; }
+  .card {
+    border: none; box-shadow: none; border-radius: 0;
+    padding: 0; margin: 0 0 12pt;
+  }
+  .worksheet, .answer-key { break-inside: auto; }
+  .ws-item { break-inside: avoid; page-break-inside: avoid; }
+  .answer-key { break-before: page; page-break-before: always; }
+  /* Keep figure shading/colour when printing. */
+  .nvr-fig, .ws-key, .progress {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .nvr-fig { border: 1px solid #999 !important; }
+  a[href]:after { content: ""; }
 }

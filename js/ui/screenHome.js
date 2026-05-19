@@ -1,6 +1,9 @@
-import { h, button, progressBar, clear } from "./components.js";
-import { TOPICS } from "../topics.js";
-import { overallReadiness, band } from "../analytics.js";
+import {
+  h, button, progressBar, subjectPill, engagementWidget, clear,
+} from "./components.js";
+import { TOPICS, activeSubjects } from "../topics.js";
+import { overallReadiness, subjectReadiness, band } from "../analytics.js";
+import { goalProgress, BADGES } from "../engagement.js";
 
 export function renderHome(ctx) {
   const { state, mount } = ctx;
@@ -21,7 +24,7 @@ export function renderHome(ctx) {
       h("h1", { text: who ? `Hi ${who}! 👋` : "Hi there! 👋" }),
       h("p", {
         class: "muted",
-        text: "Practice maths for your senior school entrance exam. The questions get harder as you get better — and explain everything when you go wrong.",
+        text: "Practise maths, verbal & non-verbal reasoning and English for your senior school entrance exam. The questions get harder as you get better — and explain everything when you go wrong.",
       }),
       g.totalAnswered
         ? h("p", {
@@ -29,6 +32,22 @@ export function renderHome(ctx) {
               readiness * 100
             )}%`,
           })
+        : null,
+      g.totalAnswered
+        ? h(
+            "div",
+            { class: "subj-chips" },
+            activeSubjects()
+              .map((s) => {
+                const sr = subjectReadiness(state, s.id, board);
+                if (sr == null) return null;
+                return h("span", { class: "subj-chip" }, [
+                  h("span", { class: "muted", text: s.name + ": " }),
+                  subjectPill(band(sr).label, band(sr)),
+                ]);
+              })
+              .filter(Boolean)
+          )
         : null,
       progressBar(
         mastered / TOPICS.length,
@@ -44,6 +63,8 @@ export function renderHome(ctx) {
       ]),
     ])
   );
+
+  mount.appendChild(engagementWidget(state, goalProgress, BADGES));
 
   mount.appendChild(
     h("div", { class: "stat-grid" }, [

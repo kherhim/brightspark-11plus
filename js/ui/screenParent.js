@@ -4,9 +4,13 @@ import {
   levelDots,
   masteryBadge,
   progressBar,
+  subjectPill,
+  engagementWidget,
   clear,
 } from "./components.js";
-import { TOPICS, topicById } from "../topics.js";
+import {
+  TOPICS, topicById, activeSubjects, topicsBySubject,
+} from "../topics.js";
 import { ensureTopic, exportJSON, importJSON, resetState } from "../store.js";
 import { fmtDuration } from "../format.js";
 import { countForms } from "../questionFactory.js";
@@ -14,12 +18,14 @@ import { topicForMisconception } from "../review.js";
 import { getFixit } from "../fixits.js";
 import {
   overallReadiness,
+  subjectReadiness,
   topicReadiness,
   paceStats,
   band,
   explainTopic,
   MIN_PACE_SAMPLES,
 } from "../analytics.js";
+import { goalProgress, BADGES } from "../engagement.js";
 import { BOARD_LIST, boardName } from "../boards.js";
 
 export function renderParent(ctx) {
@@ -51,6 +57,9 @@ export function renderParent(ctx) {
       ]),
     ])
   );
+
+  // Motivation: streak, daily goal and earned badges at a glance.
+  mount.appendChild(engagementWidget(state, goalProgress, BADGES));
 
   // Who is practising — sets the personalised name
   const nameInput = h("input", {
@@ -112,32 +121,48 @@ export function renderParent(ctx) {
       h("th", { text: "Pace" }),
     ])
   );
-  for (const t of TOPICS) {
-    const ts = ensureTopic(state, t.id);
-    const r = topicReadiness(ts, board);
-    const tb = band(r);
-    const ps = paceStats(ts, board);
-    const paceTxt = !ts.attempts
-      ? "—"
-      : ps.enough
-      ? ps.flag.label
-      : `collecting (${ps.n}/${MIN_PACE_SAMPLES})`;
+  for (const s of activeSubjects()) {
+    const sr = subjectReadiness(state, s.id, board);
     rTable.appendChild(
-      h("tr", { title: explainTopic(ts, board) }, [
-        h("td", { text: t.name }),
+      h("tr", { class: "subj-row" }, [
+        h("td", { colspan: "2" }, [h("b", { text: s.name })]),
         h("td", {}, [
-          h("span", {
-            class: "badge " + tb.badge,
-            text: ts.attempts ? tb.label : "Not started",
-          }),
+          sr == null
+            ? h("span", { class: "muted", text: "not assessed" })
+            : h("span", {
+                class: "badge " + band(sr).badge,
+                text: state.global.totalAnswered ? band(sr).label : "—",
+              }),
         ]),
-        h("td", {
-          class:
-            ps.enough && ps.flag.key !== "balanced" ? "pace-flag" : "muted",
-          text: paceTxt,
-        }),
       ])
     );
+    for (const t of topicsBySubject(s.id)) {
+      const ts = ensureTopic(state, t.id);
+      const r = topicReadiness(ts, board);
+      const tb = band(r);
+      const ps = paceStats(ts, board);
+      const paceTxt = !ts.attempts
+        ? "—"
+        : ps.enough
+        ? ps.flag.label
+        : `collecting (${ps.n}/${MIN_PACE_SAMPLES})`;
+      rTable.appendChild(
+        h("tr", { title: explainTopic(ts, board) }, [
+          h("td", { text: t.name }),
+          h("td", {}, [
+            h("span", {
+              class: "badge " + tb.badge,
+              text: ts.attempts ? tb.label : "Not started",
+            }),
+          ]),
+          h("td", {
+            class:
+              ps.enough && ps.flag.key !== "balanced" ? "pace-flag" : "muted",
+            text: paceTxt,
+          }),
+        ])
+      );
+    }
   }
   mount.appendChild(
     h("div", { class: "card" }, [
@@ -170,18 +195,25 @@ export function renderParent(ctx) {
       h("th", { text: "Status" }),
     ])
   );
-  for (const t of TOPICS) {
-    const ts = ensureTopic(state, t.id);
-    const a = ts.attempts ? Math.round((ts.correct / ts.attempts) * 100) : 0;
+  for (const s of activeSubjects()) {
     table.appendChild(
-      h("tr", {}, [
-        h("td", { text: t.name }),
-        h("td", {}, [levelDots(ts.level)]),
-        h("td", { text: ts.attempts ? a + "%" : "—" }),
-        h("td", { text: String(ts.attempts) }),
-        h("td", {}, [masteryBadge(ts)]),
+      h("tr", { class: "subj-row" }, [
+        h("td", { colspan: "5" }, [h("b", { text: s.name })]),
       ])
     );
+    for (const t of topicsBySubject(s.id)) {
+      const ts = ensureTopic(state, t.id);
+      const a = ts.attempts ? Math.round((ts.correct / ts.attempts) * 100) : 0;
+      table.appendChild(
+        h("tr", {}, [
+          h("td", { text: t.name }),
+          h("td", {}, [levelDots(ts.level)]),
+          h("td", { text: ts.attempts ? a + "%" : "—" }),
+          h("td", { text: String(ts.attempts) }),
+          h("td", {}, [masteryBadge(ts)]),
+        ])
+      );
+    }
   }
   mount.appendChild(h("div", { class: "card" }, [
     h("h2", { text: "Progress by topic" }),

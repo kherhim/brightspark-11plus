@@ -5,7 +5,7 @@
 // here is derived from data the app already records (mastery, accuracy,
 // level, attempts, per-question pace) and the parent can see exactly why.
 
-import { MAX_LEVEL, TOPICS } from "./topics.js";
+import { MAX_LEVEL, TOPICS, topicsBySubject } from "./topics.js";
 import { MASTERY_MIN_ATTEMPTS } from "./engine.js";
 import { boardWeight, boardPaceTarget } from "./boards.js";
 
@@ -93,6 +93,22 @@ export function overallReadiness(state, boardId) {
     rSum += w * topicReadiness(ts, boardId);
   }
   return wSum ? rSum / wSum : 0;
+}
+
+// Board-weighted average readiness across one subject's topics. Returns
+// `null` when the chosen board does not assess this subject at all (every
+// topic weighted 0, e.g. CSSE has no VR/NVR) so the UI can hide it rather
+// than show a misleading "Early days".
+export function subjectReadiness(state, subjectId, boardId) {
+  let wSum = 0;
+  let rSum = 0;
+  for (const t of topicsBySubject(subjectId)) {
+    const ts = state.topics && state.topics[t.id];
+    const w = boardWeight(boardId, t.id);
+    wSum += w;
+    rSum += w * topicReadiness(ts, boardId);
+  }
+  return wSum ? rSum / wSum : null;
 }
 
 // Shared 4-tier descriptor for a 0..1 score (readiness OR a mock fraction)

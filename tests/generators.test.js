@@ -65,6 +65,30 @@ for (const gen of ALL_GENERATORS) {
   }
 }
 
+suite("NVR figures");
+
+// NVR questions must carry inline SVG (in the stem and/or the choices)
+// and be byte-identical for a given seed (anti-memorisation: attributes
+// re-randomise, rendering is exact).
+const NVR = ALL_GENERATORS.filter((g) => g.topicId.startsWith("nvr-"));
+
+test("every NVR generator emits inline <svg> and is deterministic", () => {
+  assert(NVR.length >= 5, "all NVR generators registered");
+  for (const g of NVR) {
+    for (let level = 1; level <= 6; level++) {
+      const q1 = g.generate(level, makeRng(2026));
+      const q2 = g.generate(level, makeRng(2026));
+      assertEq(
+        JSON.stringify(q1),
+        JSON.stringify(q2),
+        `${g.id} L${level} byte-identical for a seed`
+      );
+      const blob = q1.promptHTML + q1.choices.map((c) => c.text).join("");
+      assert(blob.includes("<svg"), `${g.id} L${level} has inline SVG`);
+    }
+  }
+});
+
 suite("question bank size");
 
 test("bank has plenty of question forms and instances", () => {

@@ -11,6 +11,7 @@ import {
   paceStats,
   topicReadiness,
   overallReadiness,
+  subjectReadiness,
   band,
   scoreBand,
   explainTopic,
@@ -120,6 +121,24 @@ test("target board reweights the overall readiness", () => {
     `board emphasis on a strong topic raises overall (csse ${csse.toFixed(
       3
     )} > general ${general.toFixed(3)})`
+  );
+});
+
+test("subjectReadiness only counts its own subject's topics", () => {
+  const s = freshState();
+  // A strong maths topic must not lift the English subject readiness.
+  Object.assign(s.topics.fractions, {
+    attempts: 20, correct: 20, mastery: 1, level: 6,
+    paceMs: Array(6).fill(40000),
+  });
+  assertEq(
+    subjectReadiness(s, "english", null),
+    0,
+    "English unaffected by a strong maths topic"
+  );
+  assert(
+    subjectReadiness(s, "maths", null) > 0,
+    "maths subject reflects the strong topic"
   );
 });
 

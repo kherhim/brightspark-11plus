@@ -3,3 +3,6 @@
 node_modules/
 # Private strategy doc — kept local / in ~/.claude/plans, never published
 ECONOMICS.md
+# Wrangler local state (simulated D1/KV) — never committed
+.wrangler/
+worker/.dev.vars

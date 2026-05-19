@@ -10,5 +10,6 @@ import "./analytics.test.js";
 import "./engagement.test.js";
 import "./boards.test.js";
 import "./print.test.js";
+import "./monetisation.test.js";
 import { report } from "./harness.js";
 report();

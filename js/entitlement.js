@@ -7,6 +7,7 @@
 // pure module, so the test suite is unaffected.
 
 import { localDay } from "./engagement.js";
+import { me } from "./auth.js";
 
 // Subjects available without paying. Everything else is premium.
 export const FREE_SUBJECTS = ["maths"];
@@ -17,14 +18,29 @@ export const FREE_DAILY_CAP = 15;
 export const UPGRADE_URL = "index.html#pricing";
 
 let _paid = false;
+let _account = null; // last /me result (email, plan, valid_until, seats)
 
-// Stage B: call after a successful /me check.
 export function setPaid(v) {
   _paid = !!v;
 }
 
 export function isPaid() {
   return _paid;
+}
+
+// Last known account/entitlement info, for the Account screen.
+export function account() {
+  return _account;
+}
+
+// Ask the backend who we are + whether we're paid, and cache it. Safe to
+// call always: with no backend / no session / offline it resolves to the
+// free shape and leaves the app in free mode (no throw, no regression).
+export async function refreshEntitlement() {
+  const r = await me();
+  _account = r && r.authenticated ? r : null;
+  setPaid(!!(r && r.paid));
+  return r;
 }
 
 // A whole subject (maths/vr/nvr/english).

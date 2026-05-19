@@ -12,6 +12,11 @@ import { renderMock } from "./ui/screenMock.js";
 import { renderReview } from "./ui/screenReview.js";
 import { renderWorksheet } from "./ui/screenWorksheet.js";
 import { renderParent } from "./ui/screenParent.js";
+import { renderSignup } from "./ui/screenSignup.js";
+import { renderVerify } from "./ui/screenVerify.js";
+import { renderAccount } from "./ui/screenAccount.js";
+import { loadServerConfig } from "./config.js";
+import { refreshEntitlement } from "./entitlement.js";
 
 const mount = document.getElementById("app");
 const noticeEl = document.getElementById("notice");
@@ -51,6 +56,9 @@ const SCREENS = {
   review: renderReview,
   worksheet: renderWorksheet,
   parent: renderParent,
+  signup: renderSignup,
+  verify: renderVerify,
+  account: renderAccount,
 };
 
 function route({ name, params }) {
@@ -78,6 +86,14 @@ async function boot() {
     ctx.setNotice(
       "Heads up: this browser won't save progress (private mode or storage blocked). You can still practise, and export progress from the Parent page."
     );
+  }
+  // Monetisation boot: both are safe no-ops with no backend / offline, so
+  // the free app is unaffected until config.API_BASE is set (Stage C).
+  try {
+    await loadServerConfig();
+    await refreshEntitlement();
+  } catch (e) {
+    /* stay in free mode */
   }
   startRouter(route);
 }

@@ -85,7 +85,7 @@ export function renderSignup(ctx, params) {
       h("label", { class: "consent", for: "consent" }, [
         consent,
         h("span", {
-          html: ` I'm the parent/guardian and I agree to the terms &amp; privacy notice (v${consentV}).`,
+          html: ` I'm the parent/guardian and I agree to the <a href="./terms.html" target="_blank" rel="noopener">terms</a> &amp; <a href="./privacy.html" target="_blank" rel="noopener">privacy notice</a> (v${consentV}).`,
         }),
       ]),
       h("div", { class: "btn-row" }, [

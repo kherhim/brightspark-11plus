@@ -85,6 +85,9 @@ ACCESS_DAYS_ONEOFF = "1095"
 ACCESS_DAYS_FAMILY = "1095"
 ACCESS_DAYS_ANNUAL = "365"
 FAMILY_SEATS = "3"
+# Stays "false" until C6 real launch (privacy/terms + Resend email + the
+# test→live Stripe key swap). Flipping this to "true" with LIVE keys is
+# the deliberate revenue switch. (C5 end-to-end test passed 2026-05-19.)
 PAYMENTS_ENABLED = "false"
 [[env.production.d1_databases]]
 binding = "DB"

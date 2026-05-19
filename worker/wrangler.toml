@@ -1,0 +1,96 @@
+# Brightspark 11+ monetisation Worker.
+#
+# This file is checked in WITHOUT real ids/secrets. The owner fills the
+# binding ids after creating D1/KV (see worker/README.md), and sets secrets
+# with `wrangler secret put` (NEVER commit secrets here).
+
+name = "brightspark-worker"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# Non-secret config (safe to commit). Secrets go via `wrangler secret put`:
+#   STRIPE_SECRET, STRIPE_WEBHOOK_SECRET, EMAIL_API_KEY
+[vars]
+ALLOWED_ORIGIN = "http://localhost:8000"        # CSV of allowed site origins
+MAGIC_LINK_BASE = "http://localhost:8000/app.html"  # where /auth/verify link points
+EMAIL_FROM = "Brightspark 11+ <no-reply@example.com>"
+EMAIL_PROVIDER = "console"                       # "console" (dev) | "resend"
+CONSENT_VERSION = "2026-05-19"
+# Stripe Price ids (create them in the Stripe dashboard — test mode first):
+PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
+PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
+PRICE_ANNUAL = "price_1TYpI3IsGUHwvauqmkY1IJo9"
+# Access windows granted on successful payment (days):
+ACCESS_DAYS_ONEOFF = "1095"   # ~3 years — covers the 11+ window
+ACCESS_DAYS_FAMILY = "1095"
+ACCESS_DAYS_ANNUAL = "365"
+FAMILY_SEATS = "3"
+# Paid features stay OFF in prod until an explicit cutover:
+PAYMENTS_ENABLED = "false"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "brightspark"
+database_id = "3ac83cda-cd45-43b0-b714-42d49954868c"
+migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "5cbabf3655374aba8ef2981ee32d9743"
+
+# --- Staging: cloud on, payments off, real Stripe TEST keys -------------
+[env.staging]
+workers_dev = true
+[env.staging.vars]
+ALLOWED_ORIGIN = "https://kherhim.github.io"
+MAGIC_LINK_BASE = "https://kherhim.github.io/brightspark-11plus/app.html"
+EMAIL_PROVIDER = "console"
+EMAIL_FROM = "Brightspark 11+ <no-reply@example.com>"
+CONSENT_VERSION = "2026-05-19"
+PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
+PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
+PRICE_ANNUAL = "price_1TYpI3IsGUHwvauqmkY1IJo9"
+ACCESS_DAYS_ONEOFF = "1095"
+ACCESS_DAYS_FAMILY = "1095"
+ACCESS_DAYS_ANNUAL = "365"
+FAMILY_SEATS = "3"
+PAYMENTS_ENABLED = "true"
+# Single shared infra for launch: staging/prod reuse the one D1+KV.
+# (Split into dedicated -staging/-prod resources before real-money scale.)
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "brightspark"
+database_id = "3ac83cda-cd45-43b0-b714-42d49954868c"
+migrations_dir = "migrations"
+[[env.staging.kv_namespaces]]
+binding = "KV"
+id = "5cbabf3655374aba8ef2981ee32d9743"
+
+# --- Production: cloud on, PAYMENTS OFF until deliberate launch ---------
+# workers_dev on: the public site (github.io) calls this cross-origin, so
+# we need a stable *.workers.dev URL until/unless a custom route is added.
+[env.production]
+workers_dev = true
+[env.production.vars]
+ALLOWED_ORIGIN = "https://kherhim.github.io"
+MAGIC_LINK_BASE = "https://kherhim.github.io/brightspark-11plus/app.html"
+EMAIL_PROVIDER = "resend"
+EMAIL_FROM = "Brightspark 11+ <no-reply@example.com>"
+CONSENT_VERSION = "2026-05-19"
+PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
+PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
+PRICE_ANNUAL = "price_1TYpI3IsGUHwvauqmkY1IJo9"
+ACCESS_DAYS_ONEOFF = "1095"
+ACCESS_DAYS_FAMILY = "1095"
+ACCESS_DAYS_ANNUAL = "365"
+FAMILY_SEATS = "3"
+PAYMENTS_ENABLED = "false"
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "brightspark"
+database_id = "3ac83cda-cd45-43b0-b714-42d49954868c"
+migrations_dir = "migrations"
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "5cbabf3655374aba8ef2981ee32d9743"

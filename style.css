@@ -367,6 +367,11 @@ table.dash tr.subj-row td { background: #f1f5f9; }
 #faq details p { color: var(--muted); margin: 8px 0 0; }
 .lp-locked { padding: 6px 0 2px; }
 .lp-upsell { border: 1px dashed var(--indigo); }
+.consent {
+  display: flex; gap: 8px; align-items: flex-start;
+  margin: 12px 0; font-size: 0.9rem; color: var(--muted);
+}
+.consent input { margin-top: 4px; }
 @media (max-width: 700px) {
   .lp-prices { grid-template-columns: 1fr; }
   .lp-hero h1 { font-size: 1.9rem; }

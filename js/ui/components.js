@@ -109,6 +109,32 @@ export function engagementWidget(state, goalProgress, BADGES) {
   ]);
 }
 
+// Premium-feature paywall card. "See plans" is a full-page link to the
+// landing pricing section (app is app.html; landing is index.html).
+export function paywallCard(title, message) {
+  return h("div", { class: "card center" }, [
+    h("div", { style: "font-size:2.2rem", text: "🔒" }),
+    h("h2", { text: title || "Premium feature" }),
+    h("p", {
+      class: "muted",
+      text:
+        message ||
+        "Unlock all four subjects, mock exams, smart review, readiness analytics and printable worksheets.",
+    }),
+    h(
+      "a",
+      {
+        class: "btn big",
+        href: "index.html#pricing",
+        "data-ev": "see_pricing",
+        "data-from": "paywall",
+      },
+      "See plans"
+    ),
+    h("p", { class: "muted", text: "Maths practice stays free." }),
+  ]);
+}
+
 export function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
   return node;

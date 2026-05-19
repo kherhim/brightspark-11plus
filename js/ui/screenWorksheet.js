@@ -1,10 +1,21 @@
-import { h, button, clear } from "./components.js";
+import { h, button, clear, paywallCard } from "./components.js";
+import { featureAllowed } from "../entitlement.js";
 import { activeSubjects, topicsBySubject, topicById } from "../topics.js";
 import { buildWorksheet, worksheetBankInfo } from "../print.js";
 import { freshSeed } from "../rng.js";
 
 export function renderWorksheet(ctx) {
   const { state, mount } = ctx;
+  if (!featureAllowed("worksheet")) {
+    clear(mount);
+    mount.appendChild(
+      paywallCard(
+        "Printable worksheets are premium",
+        "Generating printable worksheets with answer keys is part of full access."
+      )
+    );
+    return;
+  }
 
   const subjects = activeSubjects();
   const cfg = {

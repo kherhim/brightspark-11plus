@@ -4,6 +4,7 @@ import {
 import { activeSubjects, topicsBySubject } from "../topics.js";
 import { ensureTopic } from "../store.js";
 import { subjectReadiness, band } from "../analytics.js";
+import { subjectAllowed } from "../entitlement.js";
 
 export function renderTopics(ctx) {
   const { state, mount } = ctx;
@@ -54,31 +55,57 @@ export function renderTopics(ctx) {
       ]),
     ]);
 
-    const grid = h("div", { class: "topic-grid" });
-    for (const t of topicsBySubject(s.id)) {
-      const ts = ensureTopic(state, t.id);
-      const acc = ts.attempts
-        ? Math.round((ts.correct / ts.attempts) * 100)
-        : 0;
-      grid.appendChild(
-        h("div", { class: "topic-tile" }, [
-          h("h3", { text: t.name }),
-          h("div", { class: "row" }, [
-            h("span", { class: "muted", text: `Level ${ts.level}/6` }),
-            levelDots(ts.level),
-          ]),
-          h("div", { class: "row" }, [
-            masteryBadge(ts),
-            h("span", {
-              class: "muted",
-              text: ts.attempts ? `${acc}% · ${ts.attempts} done` : "new",
-            }),
-          ]),
-          button("Practise", () => ctx.navigate("quiz/" + t.id), "btn"),
+    if (subjectAllowed(s.id)) {
+      const grid = h("div", { class: "topic-grid" });
+      for (const t of topicsBySubject(s.id)) {
+        const ts = ensureTopic(state, t.id);
+        const acc = ts.attempts
+          ? Math.round((ts.correct / ts.attempts) * 100)
+          : 0;
+        grid.appendChild(
+          h("div", { class: "topic-tile" }, [
+            h("h3", { text: t.name }),
+            h("div", { class: "row" }, [
+              h("span", { class: "muted", text: `Level ${ts.level}/6` }),
+              levelDots(ts.level),
+            ]),
+            h("div", { class: "row" }, [
+              masteryBadge(ts),
+              h("span", {
+                class: "muted",
+                text: ts.attempts ? `${acc}% · ${ts.attempts} done` : "new",
+              }),
+            ]),
+            button("Practise", () => ctx.navigate("quiz/" + t.id), "btn"),
+          ])
+        );
+      }
+      section.appendChild(grid);
+    } else {
+      section.appendChild(
+        h("div", { class: "lp-locked" }, [
+          h("p", {
+            class: "muted",
+            text:
+              "🔒 " +
+              topicsBySubject(s.id)
+                .map((t) => t.name)
+                .join(" · ") +
+              " — premium.",
+          }),
+          h(
+            "a",
+            {
+              class: "btn",
+              href: "index.html#pricing",
+              "data-ev": "see_pricing",
+              "data-from": "topics_locked",
+            },
+            "See plans"
+          ),
         ])
       );
     }
-    section.appendChild(grid);
     mount.appendChild(section);
   }
 }

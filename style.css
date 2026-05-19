@@ -328,6 +328,50 @@ table.dash tr.subj-row td { background: #f1f5f9; }
   body { font-size: 17px; }
 }
 
+/* Landing page (marketing) */
+.lp-main { max-width: 860px; }
+.app-header nav a.lp-nav-cta {
+  background: #fff; color: var(--indigo); padding: 6px 14px;
+  border-radius: 999px; margin-left: 18px;
+}
+.app-header nav a.lp-nav-cta:hover { text-decoration: none; opacity: 0.9; }
+.lp-hero { padding: 40px 24px; }
+.lp-hero h1 { font-size: 2.4rem; line-height: 1.15; }
+.lp-sub { font-size: 1.2rem; color: var(--muted); max-width: 620px; margin: 12px auto 22px; }
+.lp-fineprint { font-size: 0.85rem; margin-top: 14px; }
+.lp-trust { margin: 0 0 18px; }
+.lp-why ul, #how ul, #subjects + .card ul { line-height: 1.7; }
+.lp-prices {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  margin: 18px 0 8px;
+}
+.lp-price {
+  position: relative; border: 1px solid var(--line); border-radius: 14px;
+  padding: 20px; display: flex; flex-direction: column;
+}
+.lp-price h3 { margin: 0 0 4px; }
+.lp-price ul { padding-left: 20px; margin: 10px 0 16px; line-height: 1.6; flex: 1; }
+.lp-price .btn { margin-top: auto; text-align: center; }
+.lp-price-best { border-color: var(--indigo); box-shadow: 0 0 0 2px var(--indigo) inset; }
+.lp-amount { font-size: 2rem; font-weight: 800; color: var(--indigo); }
+.lp-amount .lp-once { font-size: 0.9rem; font-weight: 600; color: var(--muted); }
+.lp-badge {
+  position: absolute; top: -12px; right: 14px; background: var(--indigo);
+  color: #fff; font-size: 0.72rem; font-weight: 700; padding: 4px 10px;
+  border-radius: 999px;
+}
+#faq details {
+  border-bottom: 1px solid var(--line); padding: 10px 0;
+}
+#faq summary { font-weight: 700; cursor: pointer; }
+#faq details p { color: var(--muted); margin: 8px 0 0; }
+.lp-locked { padding: 6px 0 2px; }
+.lp-upsell { border: 1px dashed var(--indigo); }
+@media (max-width: 700px) {
+  .lp-prices { grid-template-columns: 1fr; }
+  .lp-hero h1 { font-size: 1.9rem; }
+}
+
 /* Printing: only the worksheet + answer key, on clean white paper. */
 @media print {
   .app-header, .app-footer, #notice, .no-print { display: none !important; }

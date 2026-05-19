@@ -4,7 +4,8 @@
 // Review answers are real graded practice (they help mastery), and each
 // item's Leitner box is moved by THIS attempt's result.
 
-import { h, button, clear } from "./components.js";
+import { h, button, clear, paywallCard } from "./components.js";
+import { featureAllowed } from "../entitlement.js";
 import { renderSolution, correctAnswerText } from "./screenQuiz.js";
 import {
   getQuestion,
@@ -24,6 +25,16 @@ import { checkNumeric } from "../format.js";
 
 export function renderReview(ctx) {
   const { state, mount } = ctx;
+  if (!featureAllowed("review")) {
+    clear(mount);
+    mount.appendChild(
+      paywallCard(
+        "Smart review is premium",
+        "Spaced re-testing of your child's own mistakes and the fix-it mini-lessons are part of full access."
+      )
+    );
+    return;
+  }
   const who = ((state.profile && state.profile.childName) || "").trim();
 
   // Ask one graded question; report correctness to `done(correct)`.

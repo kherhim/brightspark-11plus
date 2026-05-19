@@ -4,6 +4,7 @@ import {
 import { TOPICS, activeSubjects } from "../topics.js";
 import { overallReadiness, subjectReadiness, band } from "../analytics.js";
 import { goalProgress, BADGES } from "../engagement.js";
+import { isPaid } from "../entitlement.js";
 
 export function renderHome(ctx) {
   const { state, mount } = ctx;
@@ -65,6 +66,29 @@ export function renderHome(ctx) {
   );
 
   mount.appendChild(engagementWidget(state, goalProgress, BADGES));
+
+  if (!isPaid()) {
+    mount.appendChild(
+      h("div", { class: "card center lp-upsell" }, [
+        h("h2", { text: "Unlock the full 11+ course" }),
+        h("p", {
+          class: "muted",
+          text:
+            "Maths is free. Add Verbal & Non-Verbal Reasoning and English, plus mock exams, smart review, readiness analytics and printable worksheets — one small payment, no subscription.",
+        }),
+        h(
+          "a",
+          {
+            class: "btn big",
+            href: "index.html#pricing",
+            "data-ev": "see_pricing",
+            "data-from": "home_upsell",
+          },
+          "See plans"
+        ),
+      ])
+    );
+  }
 
   mount.appendChild(
     h("div", { class: "stat-grid" }, [

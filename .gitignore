@@ -1,3 +1,5 @@
 .DS_Store
 *.log
 node_modules/
+# Private strategy doc — kept local / in ~/.claude/plans, never published
+ECONOMICS.md

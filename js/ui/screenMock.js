@@ -3,7 +3,8 @@
 // submit it writes one mock record (muted into progress — never moves the
 // practice ladder) and shows a results report with every worked solution.
 
-import { h, button, clear, levelDots } from "./components.js";
+import { h, button, clear, levelDots, paywallCard } from "./components.js";
+import { featureAllowed } from "../entitlement.js";
 import { renderSolution, correctAnswerText } from "./screenQuiz.js";
 import { getQuestion } from "../questionFactory.js";
 import { recordMockOutcome, presentationLevel } from "../engine.js";
@@ -27,6 +28,16 @@ export function renderMock(ctx, params) {
   if (mockTimer) {
     clearInterval(mockTimer);
     mockTimer = null;
+  }
+  if (!featureAllowed("mock")) {
+    clear(mount);
+    mount.appendChild(
+      paywallCard(
+        "Mock exams are premium",
+        "Timed mock papers, the marked report and the readiness breakdown are part of full access."
+      )
+    );
+    return;
   }
 
   const subjects = activeSubjects();

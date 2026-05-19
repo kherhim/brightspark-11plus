@@ -6,7 +6,7 @@ import { refreshEntitlement, account, isPaid } from "../entitlement.js";
 const PLANS = [
   { id: "oneoff", label: "11+ Access", price: "£34 one-off" },
   { id: "family", label: "Family (up to 3 children)", price: "£49 one-off" },
-  { id: "annual", label: "Annual", price: "£39 / year" },
+  { id: "annual", label: "Annual", price: "£29 (12 months)" },
 ];
 
 export function renderAccount(ctx, params) {

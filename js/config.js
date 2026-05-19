@@ -4,7 +4,7 @@
 // The owner sets API_BASE to the deployed Worker URL at cutover (Stage C)
 // — that single change "switches on" accounts/paywall.
 
-export const API_BASE = ""; // e.g. "https://brightspark-worker.<acct>.workers.dev"
+export const API_BASE = "https://brightspark-worker-production.brightspark.workers.dev"; // live Worker — Stage C cutover
 
 let _serverConfig = null; // mirror of GET /config once fetched
 

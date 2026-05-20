@@ -1,4 +1,4 @@
-// Brightspark 11+ monetisation Worker: magic-link auth, entitlement and
+// Brightspark Prep monetisation Worker: magic-link auth, entitlement and
 // Stripe Checkout. Minimal by design — no progress sync, no benchmarking,
 // no AI (deferred). The static site only talks to this when js/config.js
 // has an API base AND the user has a session; otherwise the app is the
@@ -286,7 +286,7 @@ async function sendMagicLink(env, email, link) {
       body: JSON.stringify({
         from: env.EMAIL_FROM,
         to: email,
-        subject: "Your Brightspark 11+ sign-in link",
+        subject: "Your Brightspark Prep sign-in link",
         text: `Tap to sign in (valid 15 minutes):\n\n${link}\n\nIf you didn't request this, ignore this email.`,
       }),
     });

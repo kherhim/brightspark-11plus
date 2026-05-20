@@ -76,7 +76,7 @@ export function renderSignup(ctx, params) {
 
   mount.appendChild(
     h("div", { class: "card" }, [
-      h("h1", { text: "Sign in to Brightspark 11+" }),
+      h("h1", { text: "Sign in to Brightspark Prep" }),
       h("p", {
         class: "muted",
         text: "Passwordless: enter a parent email and we'll send a one-time sign-in link. Accounts unlock full access across your devices.",

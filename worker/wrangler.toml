@@ -1,4 +1,4 @@
-# Brightspark 11+ monetisation Worker.
+# Brightspark Prep monetisation Worker.
 #
 # This file is checked in WITHOUT real ids/secrets. The owner fills the
 # binding ids after creating D1/KV (see worker/README.md), and sets secrets
@@ -14,7 +14,7 @@ workers_dev = true
 [vars]
 ALLOWED_ORIGIN = "http://localhost:8000"        # CSV of allowed site origins
 MAGIC_LINK_BASE = "http://localhost:8000/app.html"  # where /auth/verify link points
-EMAIL_FROM = "Brightspark 11+ <no-reply@example.com>"
+EMAIL_FROM = "Brightspark Prep <no-reply@example.com>"
 EMAIL_PROVIDER = "console"                       # "console" (dev) | "resend"
 CONSENT_VERSION = "2026-05-19"
 # Stripe Price ids (create them in the Stripe dashboard — test mode first):
@@ -48,7 +48,7 @@ workers_dev = true
 ALLOWED_ORIGIN = "https://brightsparkprep.com,https://www.brightsparkprep.com,https://kherhim.github.io"
 MAGIC_LINK_BASE = "https://brightsparkprep.com/app.html"
 EMAIL_PROVIDER = "console"
-EMAIL_FROM = "Brightspark 11+ <no-reply@brightsparkprep.com>"
+EMAIL_FROM = "Brightspark Prep <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-19"
 PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
 PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
@@ -80,7 +80,7 @@ workers_dev = true
 ALLOWED_ORIGIN = "https://brightsparkprep.com,https://www.brightsparkprep.com,https://kherhim.github.io"
 MAGIC_LINK_BASE = "https://brightsparkprep.com/app.html"
 EMAIL_PROVIDER = "resend"
-EMAIL_FROM = "Brightspark 11+ <no-reply@brightsparkprep.com>"
+EMAIL_FROM = "Brightspark Prep <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-19"
 PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
 PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"

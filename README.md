@@ -1,4 +1,4 @@
-# Brightspark 11+ — Adaptive 11+ Practice
+# Brightspark Prep — Adaptive 11+ Practice
 
 A browser-based adaptive practice app for the UK senior-school entrance exams
 (the "11+", sat in Year 6). **Free to start with no account needed to

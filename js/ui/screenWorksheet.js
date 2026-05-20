@@ -156,7 +156,7 @@ export function renderWorksheet(ctx) {
     const sheet = h("div", { class: "card worksheet" }, [
       h("div", { class: "ws-head" }, [
         h("h2", { text: `${t ? t.name : cfg.topicId} — Level ${ws.level}` }),
-        h("div", { class: "muted", text: `Brightspark 11+ · ${ws.count} questions` }),
+        h("div", { class: "muted", text: `Brightspark Prep · ${ws.count} questions` }),
         h("div", { class: "ws-meta" }, [
           h("span", { text: who ? `Name: ${who}` : "Name: ____________" }),
           h("span", { text: `Date: ${date}` }),

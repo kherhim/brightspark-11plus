@@ -1,4 +1,4 @@
-# Brightspark 11+ — monetisation Worker (runbook)
+# Brightspark Prep — monetisation Worker (runbook)
 
 The minimal backend that turns the free app into a paid one: passwordless
 magic-link auth, server-verified entitlement, Stripe Checkout. **Separate

@@ -13,11 +13,14 @@ is the acquisition funnel; goal is ~£20k/month profit (see `ECONOMICS.md`).
 
 ## Live
 
-- **Site (GitHub Pages):** https://kherhim.github.io/brightspark-11plus/
+- **Site (GitHub Pages, custom domain):** https://brightsparkprep.com/
   (landing `index.html`, app `app.html`, `privacy.html`, `terms.html`)
+  Old URL https://kherhim.github.io/brightspark-11plus/ auto-redirects.
 - **Backend (Cloudflare Worker):**
   https://brightspark-worker-production.brightspark.workers.dev
 - **Repo:** public (`kherhim/brightspark-11plus`); Pages serves `main`.
+- **Domain registrar:** Cloudflare Registrar (apex `brightsparkprep.com`,
+  www CNAME → apex). DNS managed at Cloudflare.
 
 ## Architecture
 

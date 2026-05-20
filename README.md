@@ -6,7 +6,7 @@ practise**; progress saves locally in the browser. Built for any child
 preparing for the 11+ (set the child's name on the Parent page to
 personalise it).
 
-**Live:** <https://kherhim.github.io/brightspark-11plus/>
+**Live:** <https://brightsparkprep.com/>
 
 > Covers all four 11+ subjects: **Maths, Verbal Reasoning, Non-Verbal
 > Reasoning and (auto-markable) English**.

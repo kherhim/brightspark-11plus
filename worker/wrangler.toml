@@ -43,10 +43,12 @@ id = "5cbabf3655374aba8ef2981ee32d9743"
 [env.staging]
 workers_dev = true
 [env.staging.vars]
-ALLOWED_ORIGIN = "https://kherhim.github.io"
-MAGIC_LINK_BASE = "https://kherhim.github.io/brightspark-11plus/app.html"
+# Custom domain primary; github.io kept as defensive transition fallback
+# (can be removed after the custom-domain cutover has bedded in).
+ALLOWED_ORIGIN = "https://brightsparkprep.com,https://www.brightsparkprep.com,https://kherhim.github.io"
+MAGIC_LINK_BASE = "https://brightsparkprep.com/app.html"
 EMAIL_PROVIDER = "console"
-EMAIL_FROM = "Brightspark 11+ <no-reply@example.com>"
+EMAIL_FROM = "Brightspark 11+ <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-19"
 PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
 PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
@@ -73,10 +75,12 @@ id = "5cbabf3655374aba8ef2981ee32d9743"
 [env.production]
 workers_dev = true
 [env.production.vars]
-ALLOWED_ORIGIN = "https://kherhim.github.io"
-MAGIC_LINK_BASE = "https://kherhim.github.io/brightspark-11plus/app.html"
+# Custom domain primary; github.io kept as defensive transition fallback
+# (remove after custom-domain cutover has bedded in).
+ALLOWED_ORIGIN = "https://brightsparkprep.com,https://www.brightsparkprep.com,https://kherhim.github.io"
+MAGIC_LINK_BASE = "https://brightsparkprep.com/app.html"
 EMAIL_PROVIDER = "resend"
-EMAIL_FROM = "Brightspark 11+ <no-reply@example.com>"
+EMAIL_FROM = "Brightspark 11+ <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-19"
 PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
 PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"

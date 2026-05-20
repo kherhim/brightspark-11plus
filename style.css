@@ -1,17 +1,21 @@
 /* Kid-friendly, high-contrast, large-text UI. No framework. */
+/* Palette MOCK (palette-gold branch): "Brightspark" warm-gold theme.
+   Variable names still say --indigo because this is a value-only swap so the
+   change is dead-easy to revert / preview. If approved, follow-up renames to
+   --spark / --spark-dark across the codebase. */
 :root {
-  --indigo: #4f46e5;
-  --indigo-dark: #3730a3;
+  --indigo: #f59e0b;        /* amber-500: brand gold ("spark"). Pairs with --ink text for AAA contrast. */
+  --indigo-dark: #b45309;   /* amber-700: button hover */
   --green: #16a34a;
   --green-bg: #dcfce7;
   --red: #dc2626;
   --red-bg: #fee2e2;
   --amber: #d97706;
-  --ink: #1e293b;
-  --muted: #64748b;
+  --ink: #1c1917;           /* stone-900: warm near-black (was cool slate). Header bg + body text. */
+  --muted: #78716c;         /* stone-500: warm grey (was cool slate). */
   --card: #ffffff;
-  --bg: #f1f5f9;
-  --line: #e2e8f0;
+  --bg: #fffbeb;            /* amber-50: very subtle cream page bg. */
+  --line: #e7e5e4;          /* stone-200: warm border. */
 }
 
 * { box-sizing: border-box; }
@@ -32,7 +36,7 @@ body {
   flex-wrap: wrap;
   gap: 8px;
   padding: 14px 20px;
-  background: var(--indigo);
+  background: var(--ink);   /* dark header — strong differentiator from indigo competitors */
   color: #fff;
 }
 .app-header .logo {
@@ -42,7 +46,7 @@ body {
   text-decoration: none;
 }
 .app-header nav a {
-  color: #e0e7ff;
+  color: #fde68a;   /* amber-200: gold-tinted nav link on dark header */
   text-decoration: none;
   margin-left: 18px;
   font-weight: 600;
@@ -94,11 +98,11 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
   border-radius: 12px;
   border: none;
   background: var(--indigo);
-  color: #fff;
+  color: var(--ink);   /* black text on gold button — 7:1 contrast (AAA), reads punchy */
   cursor: pointer;
   transition: transform 0.05s, background 0.15s;
 }
-.btn:hover { background: var(--indigo-dark); }
+.btn:hover { background: var(--indigo-dark); color: #fff; }   /* deeper gold + white text on hover */
 .btn:active { transform: scale(0.98); }
 .btn.big { font-size: 1.25rem; padding: 18px 34px; }
 .btn.secondary { background: #e2e8f0; color: var(--ink); }
@@ -123,7 +127,7 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
 .choice {
   text-align: left;
   font: inherit;
-  background: #f8fafc;
+  background: #fafaf9;
   border: 2px solid var(--line);
   border-radius: 12px;
   padding: 16px 18px;
@@ -132,11 +136,11 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
   gap: 14px;
   align-items: center;
 }
-.choice:hover { border-color: var(--indigo); background: #eef2ff; }
+.choice:hover { border-color: var(--indigo); background: #fef3c7; }   /* amber-100 tint */
 .choice .key {
   font-weight: 800;
   background: var(--indigo);
-  color: #fff;
+  color: var(--ink);   /* black on gold */
   border-radius: 8px;
   width: 34px;
   height: 34px;
@@ -146,7 +150,7 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
 }
 .choice.correct { border-color: var(--green); background: var(--green-bg); }
 .choice.wrong { border-color: var(--red); background: var(--red-bg); }
-.choice.picked { border-color: var(--indigo); background: #eef2ff; }
+.choice.picked { border-color: var(--indigo); background: #fef3c7; }
 .choice[disabled] { cursor: default; }
 
 .numeric-entry { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
@@ -171,7 +175,7 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
 .steps li { margin: 4px 0; }
 .concept {
   margin-top: 14px;
-  background: #eef2ff;
+  background: #fef3c7;   /* amber-100 callout tint */
   border-left: 4px solid var(--indigo);
   padding: 10px 14px;
   border-radius: 6px;
@@ -262,7 +266,7 @@ table.dash th { color: var(--muted); font-weight: 700; }
 /* Reading passage / cloze text inside a question */
 .question .passage {
   font-weight: 400; font-size: 1.02rem; line-height: 1.6;
-  background: #f8fafc; border-left: 4px solid var(--indigo);
+  background: #fafaf9; border-left: 4px solid var(--indigo);
   padding: 12px 16px; border-radius: 8px; margin-bottom: 14px;
 }
 
@@ -295,8 +299,8 @@ table.dash tr.subj-row td { background: #f1f5f9; }
   display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;
 }
 .badge-chip {
-  background: #eef2ff; color: var(--indigo-dark);
-  border: 1px solid #c7d2fe; border-radius: 999px;
+  background: #fef3c7; color: var(--indigo-dark);   /* amber-100 bg + amber-700 ink */
+  border: 1px solid #fde68a; border-radius: 999px;   /* amber-200 border */
   padding: 5px 12px; font-size: 0.82rem; font-weight: 700;
 }
 
@@ -331,7 +335,7 @@ table.dash tr.subj-row td { background: #f1f5f9; }
 /* Landing page (marketing) */
 .lp-main { max-width: 860px; }
 .app-header nav a.lp-nav-cta {
-  background: #fff; color: var(--indigo); padding: 6px 14px;
+  background: var(--indigo); color: var(--ink); padding: 6px 14px;   /* gold pill on dark header */
   border-radius: 999px; margin-left: 18px;
 }
 .app-header nav a.lp-nav-cta:hover { text-decoration: none; opacity: 0.9; }
@@ -357,7 +361,7 @@ table.dash tr.subj-row td { background: #f1f5f9; }
 .lp-amount .lp-once { font-size: 0.9rem; font-weight: 600; color: var(--muted); }
 .lp-badge {
   position: absolute; top: -12px; right: 14px; background: var(--indigo);
-  color: #fff; font-size: 0.72rem; font-weight: 700; padding: 4px 10px;
+  color: var(--ink); font-size: 0.72rem; font-weight: 700; padding: 4px 10px;
   border-radius: 999px;
 }
 #faq details {

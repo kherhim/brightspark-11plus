@@ -1,11 +1,8 @@
 /* Kid-friendly, high-contrast, large-text UI. No framework. */
-/* Palette MOCK (palette-gold branch): "Brightspark" warm-gold theme.
-   Variable names still say --indigo because this is a value-only swap so the
-   change is dead-easy to revert / preview. If approved, follow-up renames to
-   --spark / --spark-dark across the codebase. */
+/* "Brightspark" warm-gold theme — palette tokens below. */
 :root {
-  --indigo: #f59e0b;        /* amber-500: brand gold ("spark"). Pairs with --ink text for AAA contrast. */
-  --indigo-dark: #b45309;   /* amber-700: button hover */
+  --spark: #f59e0b;         /* amber-500: brand gold. Pairs with --ink text for AAA contrast. */
+  --spark-dark: #b45309;    /* amber-700: button hover */
   --green: #16a34a;
   --green-bg: #dcfce7;
   --red: #dc2626;
@@ -97,12 +94,12 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
   padding: 14px 22px;
   border-radius: 12px;
   border: none;
-  background: var(--indigo);
+  background: var(--spark);
   color: var(--ink);   /* black text on gold button — 7:1 contrast (AAA), reads punchy */
   cursor: pointer;
   transition: transform 0.05s, background 0.15s;
 }
-.btn:hover { background: var(--indigo-dark); color: #fff; }   /* deeper gold + white text on hover */
+.btn:hover { background: var(--spark-dark); color: #fff; }   /* deeper gold + white text on hover */
 .btn:active { transform: scale(0.98); }
 .btn.big { font-size: 1.25rem; padding: 18px 34px; }
 .btn.secondary { background: #e2e8f0; color: var(--ink); }
@@ -136,10 +133,10 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
   gap: 14px;
   align-items: center;
 }
-.choice:hover { border-color: var(--indigo); background: #fef3c7; }   /* amber-100 tint */
+.choice:hover { border-color: var(--spark); background: #fef3c7; }   /* amber-100 tint */
 .choice .key {
   font-weight: 800;
-  background: var(--indigo);
+  background: var(--spark);
   color: var(--ink);   /* black on gold */
   border-radius: 8px;
   width: 34px;
@@ -150,7 +147,7 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
 }
 .choice.correct { border-color: var(--green); background: var(--green-bg); }
 .choice.wrong { border-color: var(--red); background: var(--red-bg); }
-.choice.picked { border-color: var(--indigo); background: #fef3c7; }
+.choice.picked { border-color: var(--spark); background: #fef3c7; }
 .choice[disabled] { cursor: default; }
 
 .numeric-entry { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
@@ -162,7 +159,7 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
   border-radius: 12px;
   width: 200px;
 }
-.numeric-entry input:focus { outline: none; border-color: var(--indigo); }
+.numeric-entry input:focus { outline: none; border-color: var(--spark); }
 
 /* Feedback */
 .feedback { margin-top: 20px; border-radius: 12px; padding: 18px; }
@@ -176,7 +173,7 @@ h2 { font-size: 1.3rem; margin: 0 0 12px; }
 .concept {
   margin-top: 14px;
   background: #fef3c7;   /* amber-100 callout tint */
-  border-left: 4px solid var(--indigo);
+  border-left: 4px solid var(--spark);
   padding: 10px 14px;
   border-radius: 6px;
 }
@@ -250,7 +247,7 @@ table.dash th { color: var(--muted); font-weight: 700; }
   margin-bottom: 18px;
 }
 .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
-.stat .big { font-size: 1.6rem; font-weight: 800; color: var(--indigo); }
+.stat .big { font-size: 1.6rem; font-weight: 800; color: var(--spark); }
 .stat .lbl { color: var(--muted); font-size: 0.85rem; }
 
 /* Non-Verbal Reasoning figures */
@@ -266,7 +263,7 @@ table.dash th { color: var(--muted); font-weight: 700; }
 /* Reading passage / cloze text inside a question */
 .question .passage {
   font-weight: 400; font-size: 1.02rem; line-height: 1.6;
-  background: #fafaf9; border-left: 4px solid var(--indigo);
+  background: #fafaf9; border-left: 4px solid var(--spark);
   padding: 12px 16px; border-radius: 8px; margin-bottom: 14px;
 }
 
@@ -299,7 +296,7 @@ table.dash tr.subj-row td { background: #f1f5f9; }
   display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;
 }
 .badge-chip {
-  background: #fef3c7; color: var(--indigo-dark);   /* amber-100 bg + amber-700 ink */
+  background: #fef3c7; color: var(--spark-dark);   /* amber-100 bg + amber-700 ink */
   border: 1px solid #fde68a; border-radius: 999px;   /* amber-200 border */
   padding: 5px 12px; font-size: 0.82rem; font-weight: 700;
 }
@@ -335,7 +332,7 @@ table.dash tr.subj-row td { background: #f1f5f9; }
 /* Landing page (marketing) */
 .lp-main { max-width: 860px; }
 .app-header nav a.lp-nav-cta {
-  background: var(--indigo); color: var(--ink); padding: 6px 14px;   /* gold pill on dark header */
+  background: var(--spark); color: var(--ink); padding: 6px 14px;   /* gold pill on dark header */
   border-radius: 999px; margin-left: 18px;
 }
 .app-header nav a.lp-nav-cta:hover { text-decoration: none; opacity: 0.9; }
@@ -356,11 +353,11 @@ table.dash tr.subj-row td { background: #f1f5f9; }
 .lp-price h3 { margin: 0 0 4px; }
 .lp-price ul { padding-left: 20px; margin: 10px 0 16px; line-height: 1.6; flex: 1; }
 .lp-price .btn { margin-top: auto; text-align: center; }
-.lp-price-best { border-color: var(--indigo); box-shadow: 0 0 0 2px var(--indigo) inset; }
-.lp-amount { font-size: 2rem; font-weight: 800; color: var(--indigo); }
+.lp-price-best { border-color: var(--spark); box-shadow: 0 0 0 2px var(--spark) inset; }
+.lp-amount { font-size: 2rem; font-weight: 800; color: var(--spark); }
 .lp-amount .lp-once { font-size: 0.9rem; font-weight: 600; color: var(--muted); }
 .lp-badge {
-  position: absolute; top: -12px; right: 14px; background: var(--indigo);
+  position: absolute; top: -12px; right: 14px; background: var(--spark);
   color: var(--ink); font-size: 0.72rem; font-weight: 700; padding: 4px 10px;
   border-radius: 999px;
 }
@@ -370,7 +367,7 @@ table.dash tr.subj-row td { background: #f1f5f9; }
 #faq summary { font-weight: 700; cursor: pointer; }
 #faq details p { color: var(--muted); margin: 8px 0 0; }
 .lp-locked { padding: 6px 0 2px; }
-.lp-upsell { border: 1px dashed var(--indigo); }
+.lp-upsell { border: 1px dashed var(--spark); }
 .consent {
   display: flex; gap: 8px; align-items: flex-start;
   margin: 12px 0; font-size: 0.9rem; color: var(--muted);

@@ -1,7 +1,7 @@
 import { h, button, levelDots, clear, paywallCard } from "./components.js";
 import { TOPICS, topicById } from "../topics.js";
 import {
-  isPaid,
+  fullAccess,
   subjectAllowed,
   freeTopicIds,
   dailyCapReached,
@@ -67,7 +67,7 @@ export function renderQuiz(ctx, params) {
 
   function pickTopic() {
     if (practiceTopic) return practiceTopic;
-    const pool = isPaid() ? null : freeTopicIds(TOPICS);
+    const pool = fullAccess() ? null : freeTopicIds(TOPICS);
     return selectTopic(state, makeRng(freshSeed()), Date.now(), pool);
   }
 

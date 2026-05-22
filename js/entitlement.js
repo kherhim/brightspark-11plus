@@ -1,13 +1,15 @@
-// Free/paid entitlement gate (Stage A scaffold).
+// Free/paid entitlement gate.
 //
-// `isPaid()` is the single source of truth the UI gates on. It returns
-// false until Stage B wires it to the backend `/me` check; until then the
-// app is effectively free but the paywall paths are exercised. This module
+// `fullAccess()` is the single source of truth the UI gates on: true when
+// the account has paid OR the free-for-all launch era is on. `isPaid()`
+// is kept narrower — specifically "this account paid" — so the Account
+// screen and post-era analytics can still tell the two apart. This module
 // is UI-layer only — it is NOT imported by the engine or any node-tested
-// pure module, so the test suite is unaffected.
+// pure module.
 
 import { localDay } from "./engagement.js";
 import { me } from "./auth.js";
+import { freeEra } from "./config.js";
 
 // Subjects available without paying. Everything else is premium.
 export const FREE_SUBJECTS = ["maths"];
@@ -43,14 +45,22 @@ export async function refreshEntitlement() {
   return r;
 }
 
+// The single "may use everything" check the gate functions share. True
+// when the account has paid OR the free-for-all launch era is on. Keep
+// isPaid() separate — it still means specifically "this account paid",
+// which the Account screen and post-era analytics rely on.
+export function fullAccess() {
+  return _paid || freeEra();
+}
+
 // A whole subject (maths/vr/nvr/english).
 export function subjectAllowed(subjectId) {
-  return _paid || FREE_SUBJECTS.includes(subjectId);
+  return fullAccess() || FREE_SUBJECTS.includes(subjectId);
 }
 
 // A premium feature area: "mock" | "review" | "worksheet" | "analytics".
 export function featureAllowed(/* name */) {
-  return _paid;
+  return fullAccess();
 }
 
 // Topic ids a free user may practise (used to scope adaptive selection).
@@ -68,5 +78,5 @@ export function dailyCount(state, now = Date.now()) {
 }
 
 export function dailyCapReached(state, now = Date.now()) {
-  return !_paid && dailyCount(state, now) >= FREE_DAILY_CAP;
+  return !fullAccess() && dailyCount(state, now) >= FREE_DAILY_CAP;
 }

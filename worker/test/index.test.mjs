@@ -171,7 +171,13 @@ test("GET /config: secret-free, payments off", async () => {
   const j = await r.json();
   assert.equal(j.cloud, true);
   assert.equal(j.paymentsEnabled, false);
+  assert.equal(j.freeEra, false);
   assert.equal(JSON.stringify(j).includes("whsec"), false);
+});
+
+test("GET /config: FREE_ERA flag mirrors env", async () => {
+  const r = await worker.fetch(req("/config"), makeEnv({ FREE_ERA: "true" }));
+  assert.equal((await r.json()).freeEra, true);
 });
 
 test("CORS: preflight allowed vs blocked", async () => {

@@ -1,5 +1,5 @@
 import { h, button, clear } from "./components.js";
-import { hasBackend, paymentsEnabled } from "../config.js";
+import { hasBackend, paymentsEnabled, freeEra } from "../config.js";
 import { isSignedIn, logout, startCheckout } from "../auth.js";
 import { refreshEntitlement, account, isPaid } from "../entitlement.js";
 
@@ -20,7 +20,7 @@ export function renderAccount(ctx, params) {
         h("h1", { text: "Accounts are coming soon" }),
         h("p", {
           class: "muted",
-          text: "Maths practice is free right now — no account needed. Full access is being switched on shortly.",
+          text: "Brightspark Prep is free to use right now — no account needed. Sign-in for cross-device sync is being switched on shortly.",
         }),
         button("Practise free now", () => ctx.navigate("home"), "btn big"),
       ])
@@ -79,6 +79,16 @@ export function renderAccount(ctx, params) {
           }${until ? ` — valid until <b>${until}</b>` : ""}.`,
         }),
         h("p", { class: "muted", text: "All four subjects, mocks, smart review, analytics and worksheets are unlocked on this and any device you sign in on." })
+      );
+    } else if (freeEra()) {
+      rows.push(
+        h("p", {
+          html: "Plan: <b>full access</b> — free for everyone while Brightspark Prep is new.",
+        }),
+        h("p", {
+          class: "muted",
+          text: "All four subjects, mock exams, smart review, analytics and worksheets are unlocked — no payment needed. Your account keeps your progress in sync across every device you sign in on.",
+        })
       );
     } else if (paymentsEnabled()) {
       let pending = null;

@@ -9,6 +9,7 @@ import {
   hasBackend,
   apiUrl,
   paymentsEnabled,
+  freeEra,
   loadServerConfig,
   serverConfig,
   setServerConfig,
@@ -25,6 +26,7 @@ import {
 import {
   isPaid,
   setPaid,
+  fullAccess,
   subjectAllowed,
   featureAllowed,
   freeTopicIds,
@@ -90,8 +92,24 @@ test("no session, no throws, free shapes when backend unreachable", () => {
 
 suite("monetisation: entitlement gate");
 
-test("free tier: maths only, premium locked", () => {
+// freeEra() fails OPEN — with no server config loaded it defaults to the
+// free-for-all era being ON. The restricted-tier tests below therefore
+// pin freeEra:false explicitly; the free-era test pins it true.
+
+test("freeEra() fails open; server config can turn it off", () => {
+  setServerConfig(null);
+  assertEq(freeEra(), true, "defaults ON when config unavailable");
+  setServerConfig({ freeEra: true });
+  assertEq(freeEra(), true, "ON when the server says so");
+  setServerConfig({ freeEra: false });
+  assertEq(freeEra(), false, "OFF only when the server explicitly says so");
+  setServerConfig(null); // restore
+});
+
+test("restricted tier (era off): maths only, premium locked", () => {
+  setServerConfig({ freeEra: false });
   assertEq(isPaid(), false, "not paid by default");
+  assertEq(fullAccess(), false, "no full access: not paid and era off");
   assertEq(subjectAllowed("maths"), true, "maths free");
   assertEq(subjectAllowed("vr"), false, "VR locked");
   assertEq(subjectAllowed("nvr"), false, "NVR locked");
@@ -105,9 +123,28 @@ test("free tier: maths only, premium locked", () => {
   );
   assert(free.includes("place-value"), "maths topic free");
   assert(!free.includes("vr-vocab"), "VR topic not free");
+  setServerConfig(null); // restore
 });
 
-test("daily cap applies to free users only", () => {
+test("free era opens every subject + feature for non-paid users", () => {
+  setServerConfig({ freeEra: true });
+  assertEq(isPaid(), false, "still not a paid account");
+  assertEq(fullAccess(), true, "but the era grants full access");
+  assertEq(subjectAllowed("vr"), true, "VR open");
+  assertEq(subjectAllowed("nvr"), true, "NVR open");
+  assertEq(subjectAllowed("english"), true, "English open");
+  assertEq(featureAllowed("mock"), true, "mocks open");
+  assertEq(featureAllowed("worksheet"), true, "worksheets open");
+  assertEq(
+    dailyCapReached({ activity: { date: localDay(), answered: 9999 } }),
+    false,
+    "no daily cap during the free era"
+  );
+  setServerConfig(null); // restore
+});
+
+test("daily cap applies to restricted-tier users only", () => {
+  setServerConfig({ freeEra: false });
   const today = localDay();
   const at = (n) => ({ activity: { date: today, answered: n } });
   assertEq(dailyCount(at(7)), 7, "counts today's answers");
@@ -115,11 +152,14 @@ test("daily cap applies to free users only", () => {
     "stale day → 0");
   assertEq(dailyCapReached(at(FREE_DAILY_CAP - 1)), false, "under cap ok");
   assertEq(dailyCapReached(at(FREE_DAILY_CAP)), true, "at cap blocked");
+  setServerConfig(null); // restore
 });
 
 test("paid unlocks everything and removes the cap", () => {
+  setServerConfig({ freeEra: false });
   setPaid(true);
   assertEq(isPaid(), true, "paid");
+  assertEq(fullAccess(), true, "full access via payment");
   assertEq(subjectAllowed("vr"), true, "VR unlocked when paid");
   assertEq(featureAllowed("worksheet"), true, "features unlocked");
   assertEq(
@@ -129,6 +169,7 @@ test("paid unlocks everything and removes the cap", () => {
   );
   setPaid(false); // restore
   assertEq(isPaid(), false, "restored to free");
+  setServerConfig(null); // restore
 });
 
 test("refreshEntitlement is safe with no backend", () => {

@@ -29,6 +29,21 @@ export function paymentsEnabled() {
   return !!(_serverConfig && _serverConfig.paymentsEnabled);
 }
 
+// Free-for-all launch era: while true, every premium subject and feature
+// is open to all users with no account or payment. Fails OPEN — if the
+// server config has not loaded (offline, or a Worker blip) we default to
+// the era being ON, so a transient outage never downgrades users to the
+// restricted free tier. The Worker's /config can only ever turn it OFF.
+// When the era ends (the monetisation launch) flip BOTH the Worker's
+// FREE_ERA var and this default, so the fail-safe then points at "paid".
+const FREE_ERA_DEFAULT = true;
+
+export function freeEra() {
+  if (_serverConfig && typeof _serverConfig.freeEra === "boolean")
+    return _serverConfig.freeEra;
+  return FREE_ERA_DEFAULT;
+}
+
 // Fetch the public, secret-free server config. Safe to call always:
 // returns null (and the app stays in free mode) if there is no backend
 // or it is unreachable.

@@ -28,7 +28,7 @@ export function renderSignup(ctx, params) {
         h("h1", { text: "Accounts are coming soon" }),
         h("p", {
           class: "muted",
-          text: "Maths practice is free right now — no account needed. Full access (all four subjects, mocks, review, analytics, worksheets) is being switched on shortly.",
+          text: "Brightspark Prep is free to use right now — no account needed. Sign-in for cross-device progress sync is being switched on shortly.",
         }),
         button("Practise free now", () => ctx.navigate("home"), "btn big"),
       ])
@@ -79,7 +79,7 @@ export function renderSignup(ctx, params) {
       h("h1", { text: "Sign in to Brightspark Prep" }),
       h("p", {
         class: "muted",
-        text: "Passwordless: enter a parent email and we'll send a one-time sign-in link. Accounts unlock full access across your devices.",
+        text: "Passwordless: enter a parent email and we'll send a one-time sign-in link. An account is optional — it saves your child's progress and syncs it across your devices.",
       }),
       h("div", { class: "numeric-entry" }, [email]),
       h("label", { class: "consent", for: "consent" }, [

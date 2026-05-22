@@ -50,6 +50,7 @@ async function route(path, request, env, url) {
     return json({
       cloud: true,
       paymentsEnabled: String(env.PAYMENTS_ENABLED) === "true",
+      freeEra: String(env.FREE_ERA) === "true",
       consentVersion: env.CONSENT_VERSION || null,
       plans: [
         { id: "oneoff", label: "11+ Access" },

@@ -4,7 +4,7 @@ import {
 import { TOPICS, activeSubjects } from "../topics.js";
 import { overallReadiness, subjectReadiness, band } from "../analytics.js";
 import { goalProgress, BADGES } from "../engagement.js";
-import { isPaid } from "../entitlement.js";
+import { fullAccess } from "../entitlement.js";
 
 export function renderHome(ctx) {
   const { state, mount } = ctx;
@@ -67,7 +67,7 @@ export function renderHome(ctx) {
 
   mount.appendChild(engagementWidget(state, goalProgress, BADGES));
 
-  if (!isPaid()) {
+  if (!fullAccess()) {
     mount.appendChild(
       h("div", { class: "card center lp-upsell" }, [
         h("h2", { text: "Unlock the full 11+ course" }),

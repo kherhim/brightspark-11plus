@@ -67,26 +67,23 @@ switch on later.
 | Stage B — backend (magic-link auth + entitlement + Stripe) | ✅ built, payments dormant |
 | C1–C5 — D1/KV, Worker deploy, Stripe setup, frontend cutover, E2E test | ✅ (test-mode purchase E2E passed) |
 | Custom domain + Resend + rebrand (was "C6") | ✅ live |
-| **Free-for-all Step 1 — open the gate** | ✅ built, tests green, **not yet deployed** |
+| **Free-for-all — open the gate** | ✅ **live** (PR #1 merged + deployed 2026-05-22) |
 
 Current test state: client **430/430**, Worker **15/15** green.
 
-## Free-for-all launch — the 3-step plan
+## Free-for-all launch
 
-Direction (2026-05-22): free for everyone for the launch period, signups
-optional, then monetise. Agreed plan:
+Direction (2026-05-22): the whole product is free for everyone for the
+launch period (operator's plan: at least the first 100 days), signups
+optional, then monetise.
 
-1. **Open the gate** — ✅ **done** (built on branch, not yet deployed).
-   `fullAccess()`/`freeEra()` gate, `FREE_ERA` flag, landing page de-priced,
-   `privacy.html`/`terms.html` aligned to free + optional accounts (version
-   and `CONSENT_VERSION` bumped to 2026-05-22).
-2. **Anonymous analytics** — planned. Aggregate, non-account-linked usage
-   events; new Worker endpoint + D1 table; `privacy.html` rewrite + ICO
-   registration. Optional signup builds an email list for the day-100
-   conversion. Open decisions: provider (first-party vs Plausible/Cloudflare),
-   and the true-anonymity vs retention-measurement trade-off.
-3. **Benchmarking** — deferred. Anonymous cohort percentiles shown to parents;
-   needs a user base first.
+- **Open the gate** — ✅ **live** (PR #1, deployed 2026-05-22).
+  `fullAccess()` / `freeEra()` gate, `FREE_ERA` flag, landing page
+  de-priced, `privacy.html` / `terms.html` aligned to free + optional
+  accounts (version and `CONSENT_VERSION` bumped to 2026-05-22).
+- **User analytics / benchmarking** — explored 2026-05-22 (anonymous
+  cohort percentiles, e.g. "top 1%" by topic/subtopic) and **shelved**
+  at the operator's call; not being built for now.
 
 ## Pricing (dormant — for the eventual monetisation)
 
@@ -104,22 +101,20 @@ free era ends:
 - `PAYMENTS_ENABLED="false"` in `wrangler.toml` and live on the deployed
   Worker (`/config` confirms). `/checkout` returns 403 — charging is
   impossible until a deliberate launch flip.
-- `FREE_ERA="true"` in `wrangler.toml` (not yet on the deployed Worker — but
-  the client fails open, so free-for-all is the effective state the moment
-  the static site ships).
+- `FREE_ERA="true"` in `wrangler.toml` and live on the deployed Worker —
+  `/config` returns `freeEra:true`. The static site is deployed and
+  free-for-all is **live**. To end the era later, flip `FREE_ERA` off
+  (Worker) **and** `FREE_ERA_DEFAULT` in `js/config.js`.
 
-## Deploying free-for-all (Step 1)
+## Free-for-all — deployed
 
-No code blockers. When ready:
+Live as of 2026-05-22 (Pages build `cadeb8c`; Worker version `1cbf2e46`).
+Still recommended:
 
-- [ ] Deploy the static site (Pages) — turns free-for-all on immediately
-      (client fails open).
-- [ ] Redeploy the Worker (`npm run deploy:prod`) — adds the `FREE_ERA`
-      server flag (the kill switch to end the era later) and the
-      `CONSENT_VERSION` bump.
-- [ ] Verify: all 4 subjects + mocks + review + worksheets + analytics open,
-      no daily cap.
-- [ ] (Recommended) ICO data-protection registration — the backend already
+- [x] Static site (Pages) — free-for-all live.
+- [x] Worker redeploy — `/config` now serves `freeEra:true` and
+      `consentVersion:2026-05-22`.
+- [ ] (Recommended) ICO data-protection registration — the backend
       processes parent emails for optional accounts.
 - [ ] (Recommended) brief UK consumer-lawyer sense-check of
       `privacy.html` / `terms.html`.

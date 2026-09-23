@@ -1,6 +1,6 @@
 # Brightspark Prep — Project Status
 
-_Last updated: 2026-05-22_
+_Last updated: 2026-09-23_
 
 Living status doc. The economic rationale lives in the **private** (gitignored)
 `ECONOMICS.md`; this file is the operational state.
@@ -11,7 +11,7 @@ Local-first UK 11+ practice web app (Maths · Verbal Reasoning · Non-Verbal
 Reasoning · English). **Currently free for everyone** — every subject and
 feature, no account and no payment — for the launch period (operator's plan:
 free for at least the first 100 days, then monetise). Optional free accounts
-add cross-device sync. The monetisation path (one-off paid access; ~£20k/month
+provide passwordless sign-in; learning progress remains browser-local. The monetisation path (one-off paid access; ~£20k/month
 profit goal — see `ECONOMICS.md`) is fully built and **dormant**, ready to
 switch on later.
 
@@ -29,12 +29,13 @@ switch on later.
 ## Architecture
 
 - Zero-build static SPA (HTML/CSS/ES modules), local-first (localStorage,
-  schema v4). Used **without an account the app makes zero backend calls** —
-  nothing leaves the device.
-- Minimal backend: Cloudflare Worker + D1 (SQLite) + KV — passwordless
+  schema v4). Progress stays on the device; the Worker supplies public access
+  configuration and optional parent authentication.
+- Minimal backend: Cloudflare Worker + D1 (SQLite) — passwordless
   magic-link auth, server-verified entitlement, Stripe Checkout + webhook
-  (the payment paths are dormant). Single shared D1+KV across envs for now
-  (split before real scale).
+  (the payment paths are dormant). Staging and production now use separate
+  databases. Magic links are consumed atomically in D1, sessions are
+  environment-bound, and KV is no longer used.
 - **Free-for-all gate:** `js/entitlement.js` `fullAccess()` =
   `isPaid() || freeEra()` is the single check the UI gates on. `freeEra()`
   (`js/config.js`) reads the Worker `/config` and **fails open** — a Worker
@@ -51,8 +52,8 @@ switch on later.
 
 - **Free era (now):** all 4 subjects + mock exams + smart review + readiness
   analytics + worksheets, no daily cap — for everyone, no account, no payment.
-- **Accounts:** optional and free; magic-link sign-in; the only benefit is
-  cross-device progress sync.
+- **Accounts:** optional and free; magic-link sign-in; accounts identify parent access;
+  progress sync is not implemented.
 - **Restricted tier (dormant):** when `FREE_ERA` is flipped off (the future
   monetisation launch), free reverts to Maths + a daily question cap and the
   rest becomes paid. That gating copy/machinery is intact in the code but
@@ -69,7 +70,8 @@ switch on later.
 | Custom domain + Resend + rebrand (was "C6") | ✅ live |
 | **Free-for-all — open the gate** | ✅ **live** (PR #1 merged + deployed 2026-05-22) |
 
-Current test state: client **430/430**, Worker **15/15** green.
+Current test state: existing client **430/430**, DOM/import security **30/30**,
+Worker **64/64** green. Both dependency audits report zero known vulnerabilities.
 
 ## Free-for-all launch
 
@@ -108,7 +110,7 @@ free era ends:
 
 ## Free-for-all — deployed
 
-Live as of 2026-05-22 (Pages build `cadeb8c`; Worker version `1cbf2e46`).
+Original free-era rollout: 2026-05-22 (Pages build `cadeb8c`; Worker version `1cbf2e46`).
 Still recommended:
 
 - [x] Static site (Pages) — free-for-all live.
@@ -141,3 +143,26 @@ Still recommended:
   A + www CNAME) are **DNS only** (grey cloud), so GitHub provisions its
   own Let's Encrypt cert. Resend records (DKIM TXT at `resend._domainkey`,
   SPF TXT + MX at `send`) are TXT/MX (no proxy concept).
+
+## September 2026 security rollout
+
+PR #2 carries fixes for HTML injection/import validation, environment
+isolation, single-use expiring links, mail abuse limits, development dependency
+vulnerabilities and paid-only transactional Stripe fulfilment. Its merge
+publishes the frontend through GitHub Pages.
+
+- Dedicated staging site: https://brightspark-staging-site.brightspark.workers.dev
+- Dedicated staging API: https://brightspark-worker-staging.brightspark.workers.dev
+- Live staging email sign-in, reuse rejection, concurrent redemption, Stripe
+  test Checkout/webhook and environment-isolation checks passed.
+- Production D1 was backed up and the export restore-checked before migration
+  `0002_security.sql`. Restricted backups are excluded from Git.
+- Production Worker `044a7c77-b198-4220-a5ec-1e87fd62f904` is deployed;
+  `PAYMENTS_ENABLED=false`, `FREE_ERA=true`, and no KV binding.
+- Existing parent sessions and previously issued magic links are invalidated;
+  sign in again. Browser learning progress is preserved.
+- Historical test-mode entitlement evidence was recorded privately. The record
+  was preserved and needs reconciliation before a paid launch. Two obsolete
+  test webhooks targeting production were disabled.
+
+See `worker/README.md` for deployment and verification commands.

@@ -184,8 +184,15 @@ the grant and deduplication records commit or roll back together.
 - Staging concurrent redemption returned one success and three rejected
   replays. A real Stripe sandbox Checkout completed and its webhook granted
   the staging-only entitlement.
-- Production migration, Worker rollout and frontend publication are pending
-  the remaining staging email check. Production payments stay off.
+- The restricted staging Resend key is configured. A delivered staging link
+  signed into the expected account; reusing it was rejected.
+- Production migration 0002 applied; Worker version
+  `044a7c77-b198-4220-a5ec-1e87fd62f904` deployed successfully.
+- Production smoke checks confirm free access on, payments off, malformed
+  tokens rejected and legacy sessions rejected.
+- Two obsolete Stripe test-mode webhooks targeting production were disabled.
+  The dedicated staging test webhook remains enabled.
+- Frontend publication follows the merge of PR #2 through GitHub Pages.
 
 To prepare/redeploy the isolated staging frontend:
 

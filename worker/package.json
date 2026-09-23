@@ -5,14 +5,20 @@
   "description": "Brightspark 11+ monetisation backend — magic-link auth, entitlement and Stripe. Separate dev-only sub-project; the static site stays zero-build and does not depend on this at build time.",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy:staging": "wrangler deploy --env staging",
-    "deploy:prod": "wrangler deploy --env production",
-    "migrate:local": "wrangler d1 migrations apply brightspark --local",
-    "migrate:staging": "wrangler d1 migrations apply brightspark --env staging --remote",
-    "migrate:prod": "wrangler d1 migrations apply brightspark --env production --remote",
+    "deploy:staging": "node scripts/check-config.mjs staging && wrangler deploy --env staging",
+    "deploy:prod": "node scripts/check-config.mjs production && wrangler deploy --env production",
+    "migrate:local": "wrangler d1 migrations apply DB --local",
+    "migrate:staging": "node scripts/check-config.mjs staging && wrangler d1 migrations apply DB --env staging --remote",
+    "migrate:prod": "node scripts/check-config.mjs production && wrangler d1 migrations apply DB --env production --remote",
+    "check:staging": "node scripts/check-config.mjs staging",
+    "check:prod": "node scripts/check-config.mjs production",
     "test": "node --test test/*.test.mjs"
   },
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "smol-toml": "^1.9.0",
+    "wrangler": "^4.136.3"
   }
 }

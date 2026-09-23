@@ -1,6 +1,6 @@
 # Brightspark Prep — Project Status
 
-_Last updated: 2026-05-22_
+_Last updated: 2026-09-23_
 
 Living status doc. The economic rationale lives in the **private** (gitignored)
 `ECONOMICS.md`; this file is the operational state.
@@ -11,7 +11,7 @@ Local-first UK 11+ practice web app (Maths · Verbal Reasoning · Non-Verbal
 Reasoning · English). **Currently free for everyone** — every subject and
 feature, no account and no payment — for the launch period (operator's plan:
 free for at least the first 100 days, then monetise). Optional free accounts
-add cross-device sync. The monetisation path (one-off paid access; ~£20k/month
+provide passwordless sign-in; learning progress remains browser-local. The monetisation path (one-off paid access; ~£20k/month
 profit goal — see `ECONOMICS.md`) is fully built and **dormant**, ready to
 switch on later.
 
@@ -29,12 +29,13 @@ switch on later.
 ## Architecture
 
 - Zero-build static SPA (HTML/CSS/ES modules), local-first (localStorage,
-  schema v4). Used **without an account the app makes zero backend calls** —
-  nothing leaves the device.
-- Minimal backend: Cloudflare Worker + D1 (SQLite) + KV — passwordless
+  schema v4). Progress stays on the device; the Worker supplies public access
+  configuration and optional parent authentication.
+- Minimal backend: Cloudflare Worker + D1 (SQLite) — passwordless
   magic-link auth, server-verified entitlement, Stripe Checkout + webhook
-  (the payment paths are dormant). Single shared D1+KV across envs for now
-  (split before real scale).
+  (the payment paths are dormant). Staging and production now use separate
+  databases. Magic links are consumed atomically in D1, sessions are
+  environment-bound, and KV is no longer used.
 - **Free-for-all gate:** `js/entitlement.js` `fullAccess()` =
   `isPaid() || freeEra()` is the single check the UI gates on. `freeEra()`
   (`js/config.js`) reads the Worker `/config` and **fails open** — a Worker
@@ -51,8 +52,8 @@ switch on later.
 
 - **Free era (now):** all 4 subjects + mock exams + smart review + readiness
   analytics + worksheets, no daily cap — for everyone, no account, no payment.
-- **Accounts:** optional and free; magic-link sign-in; the only benefit is
-  cross-device progress sync.
+- **Accounts:** optional and free; magic-link sign-in; accounts identify parent access;
+  progress sync is not implemented.
 - **Restricted tier (dormant):** when `FREE_ERA` is flipped off (the future
   monetisation launch), free reverts to Maths + a daily question cap and the
   rest becomes paid. That gating copy/machinery is intact in the code but
@@ -67,26 +68,24 @@ switch on later.
 | Stage B — backend (magic-link auth + entitlement + Stripe) | ✅ built, payments dormant |
 | C1–C5 — D1/KV, Worker deploy, Stripe setup, frontend cutover, E2E test | ✅ (test-mode purchase E2E passed) |
 | Custom domain + Resend + rebrand (was "C6") | ✅ live |
-| **Free-for-all Step 1 — open the gate** | ✅ built, tests green, **not yet deployed** |
+| **Free-for-all — open the gate** | ✅ **live** (PR #1 merged + deployed 2026-05-22) |
 
-Current test state: client **430/430**, Worker **15/15** green.
+Current test state: existing client **430/430**, DOM/import security **30/30**,
+Worker **64/64** green. Both dependency audits report zero known vulnerabilities.
 
-## Free-for-all launch — the 3-step plan
+## Free-for-all launch
 
-Direction (2026-05-22): free for everyone for the launch period, signups
-optional, then monetise. Agreed plan:
+Direction (2026-05-22): the whole product is free for everyone for the
+launch period (operator's plan: at least the first 100 days), signups
+optional, then monetise.
 
-1. **Open the gate** — ✅ **done** (built on branch, not yet deployed).
-   `fullAccess()`/`freeEra()` gate, `FREE_ERA` flag, landing page de-priced,
-   `privacy.html`/`terms.html` aligned to free + optional accounts (version
-   and `CONSENT_VERSION` bumped to 2026-05-22).
-2. **Anonymous analytics** — planned. Aggregate, non-account-linked usage
-   events; new Worker endpoint + D1 table; `privacy.html` rewrite + ICO
-   registration. Optional signup builds an email list for the day-100
-   conversion. Open decisions: provider (first-party vs Plausible/Cloudflare),
-   and the true-anonymity vs retention-measurement trade-off.
-3. **Benchmarking** — deferred. Anonymous cohort percentiles shown to parents;
-   needs a user base first.
+- **Open the gate** — ✅ **live** (PR #1, deployed 2026-05-22).
+  `fullAccess()` / `freeEra()` gate, `FREE_ERA` flag, landing page
+  de-priced, `privacy.html` / `terms.html` aligned to free + optional
+  accounts (version and `CONSENT_VERSION` bumped to 2026-05-22).
+- **User analytics / benchmarking** — explored 2026-05-22 (anonymous
+  cohort percentiles, e.g. "top 1%" by topic/subtopic) and **shelved**
+  at the operator's call; not being built for now.
 
 ## Pricing (dormant — for the eventual monetisation)
 
@@ -104,22 +103,20 @@ free era ends:
 - `PAYMENTS_ENABLED="false"` in `wrangler.toml` and live on the deployed
   Worker (`/config` confirms). `/checkout` returns 403 — charging is
   impossible until a deliberate launch flip.
-- `FREE_ERA="true"` in `wrangler.toml` (not yet on the deployed Worker — but
-  the client fails open, so free-for-all is the effective state the moment
-  the static site ships).
+- `FREE_ERA="true"` in `wrangler.toml` and live on the deployed Worker —
+  `/config` returns `freeEra:true`. The static site is deployed and
+  free-for-all is **live**. To end the era later, flip `FREE_ERA` off
+  (Worker) **and** `FREE_ERA_DEFAULT` in `js/config.js`.
 
-## Deploying free-for-all (Step 1)
+## Free-for-all — deployed
 
-No code blockers. When ready:
+Original free-era rollout: 2026-05-22 (Pages build `cadeb8c`; Worker version `1cbf2e46`).
+Still recommended:
 
-- [ ] Deploy the static site (Pages) — turns free-for-all on immediately
-      (client fails open).
-- [ ] Redeploy the Worker (`npm run deploy:prod`) — adds the `FREE_ERA`
-      server flag (the kill switch to end the era later) and the
-      `CONSENT_VERSION` bump.
-- [ ] Verify: all 4 subjects + mocks + review + worksheets + analytics open,
-      no daily cap.
-- [ ] (Recommended) ICO data-protection registration — the backend already
+- [x] Static site (Pages) — free-for-all live.
+- [x] Worker redeploy — `/config` now serves `freeEra:true` and
+      `consentVersion:2026-05-22`.
+- [ ] (Recommended) ICO data-protection registration — the backend
       processes parent emails for optional accounts.
 - [ ] (Recommended) brief UK consumer-lawyer sense-check of
       `privacy.html` / `terms.html`.
@@ -146,3 +143,26 @@ No code blockers. When ready:
   A + www CNAME) are **DNS only** (grey cloud), so GitHub provisions its
   own Let's Encrypt cert. Resend records (DKIM TXT at `resend._domainkey`,
   SPF TXT + MX at `send`) are TXT/MX (no proxy concept).
+
+## September 2026 security rollout
+
+PR #2 carries fixes for HTML injection/import validation, environment
+isolation, single-use expiring links, mail abuse limits, development dependency
+vulnerabilities and paid-only transactional Stripe fulfilment. Its merge
+publishes the frontend through GitHub Pages.
+
+- Dedicated staging site: https://brightspark-staging-site.brightspark.workers.dev
+- Dedicated staging API: https://brightspark-worker-staging.brightspark.workers.dev
+- Live staging email sign-in, reuse rejection, concurrent redemption, Stripe
+  test Checkout/webhook and environment-isolation checks passed.
+- Production D1 was backed up and the export restore-checked before migration
+  `0002_security.sql`. Restricted backups are excluded from Git.
+- Production Worker `044a7c77-b198-4220-a5ec-1e87fd62f904` is deployed;
+  `PAYMENTS_ENABLED=false`, `FREE_ERA=true`, and no KV binding.
+- Existing parent sessions and previously issued magic links are invalidated;
+  sign in again. Browser learning progress is preserved.
+- Historical test-mode entitlement evidence was recorded privately. The record
+  was preserved and needs reconciliation before a paid launch. Two obsolete
+  test webhooks targeting production were disabled.
+
+See `worker/README.md` for deployment and verification commands.

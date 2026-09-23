@@ -231,8 +231,91 @@ export function exportJSON(state) {
   return JSON.stringify(state, null, 2);
 }
 
+// Validate imports before migration or persistence: a broken file must not
+// replace existing progress. Missing additive v4 fields remain migratable.
+function validateImport(state) {
+  const invalid = () => { throw new Error("Invalid progress file"); };
+  const object = v => v !== null && typeof v === "object" && !Array.isArray(v);
+  const number = v => typeof v === "number" && Number.isFinite(v) && v >= 0;
+  const string = v => typeof v === "string";
+  const nullableString = v => v === null || string(v);
+  const boolean = v => typeof v === "boolean";
+  function fields(value, spec, required = []) {
+    if (!object(value) || required.some(key => !Object.hasOwn(value, key))) invalid();
+    for (const [key, check] of Object.entries(spec)) {
+      if (Object.hasOwn(value, key) && !check(value[key])) invalid();
+    }
+    return true;
+  }
+  function list(value, check) {
+    if (!Array.isArray(value) || !value.every(check)) invalid();
+    return true;
+  }
+  function map(value, check) {
+    if (!object(value) || !Object.values(value).every(check)) invalid();
+    return true;
+  }
+  // JSON keys later become dictionary indexes; reject prototype-sensitive
+  // keys at every depth, including unknown extension fields.
+  function safeKeys(value, depth = 0) {
+    if (depth > 50) invalid();
+    if (!value || typeof value !== "object") return;
+    for (const [key, child] of Object.entries(value)) {
+      if (["__proto__", "prototype", "constructor"].includes(key)) invalid();
+      safeKeys(child, depth + 1);
+    }
+  }
+  safeKeys(state);
+  if (!object(state) || ![3, 4].includes(state.schemaVersion) ||
+      !object(state.topics) || !object(state.global)) invalid();
+  const level = v => Number.isInteger(v) && v >= 1 && v <= 6;
+  const counters = value => map(value, number);
+  const record = value => fields(value, {
+    topicId: string, level, qid: nullableString, templateId: nullableString,
+    seed: v => v === null || number(v), chosenKey: nullableString,
+    chosenText: nullableString, correctText: nullableString,
+    misconceptionId: nullableString, source: string, at: number,
+    timeMs: number, correct: boolean,
+  });
+  fields(state, {
+    createdAt: number, updatedAt: number, deviceId: string, lastTopicId: nullableString,
+    // These pre-v4 counters are incremented directly by the engine; only
+    // totalTimeMs is additive and can be backfilled by migration.
+    global: v => counters(v) && fields(v, {}, [
+      "totalAnswered", "totalCorrect", "sessionCount",
+    ]),
+    profile: v => fields(v, { board: nullableString, dailyGoal: number, childName: string }),
+    streaks: v => fields(v, { current: number, longest: number, lastActiveDay: nullableString }),
+    activity: v => fields(v, { date: nullableString, answered: number, correct: number }),
+    badges: counters, misconceptionCounts: counters,
+    topics: v => map(v, t => fields(t, {
+      level, streakCorrect: number, streakWrong: number, attempts: number,
+      correct: number, mastery: number, timeMs: number, lastSeenAt: number,
+      seenCount: number, mastered: boolean,
+      recentMistakes: v => list(v, record), misconceptionCounts: counters,
+      paceMs: v => list(v, p => fields(p, { ms: number, level, mode: string, at: number })),
+    }, [
+      "level", "streakCorrect", "streakWrong", "attempts", "correct",
+      "mastery", "timeMs", "lastSeenAt", "seenCount", "mastered",
+    ])),
+    mistakeLog: v => list(v, record),
+    leitner: v => fields(v, { boxes: b => map(b, item => {
+      record(item);
+      return fields(item, { key: string, box: number, dueAt: number, wrongCount: number,
+        lastResult: string, updatedAt: number });
+    }) }),
+    mockHistory: v => list(v, m => fields(m, {
+      id: string, at: number, subject: string, lengthQ: number, timed: boolean,
+      durationMs: number, scoreCorrect: number, scoreTotal: number, band: string,
+      items: v => list(v, record),
+      sections: v => list(v, section => fields(section, { topicId: string, correct: number, total: number })),
+    })),
+  });
+}
+
 export function importJSON(text) {
   const parsed = JSON.parse(text); // throws on bad JSON -> caller handles
+  validateImport(parsed);
   const migrated = migrate(parsed);
   saveState(migrated);
   return migrated;

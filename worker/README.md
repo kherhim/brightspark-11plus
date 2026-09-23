@@ -1,132 +1,207 @@
-# Brightspark Prep — monetisation Worker (runbook)
+# Brightspark Prep Worker runbook
 
-The minimal backend that turns the free app into a paid one: passwordless
-magic-link auth, server-verified entitlement, Stripe Checkout. **Separate
-dev-only sub-project** — the static site stays zero-build and does not
-depend on this at build time.
+This separate backend provides parent magic-link authentication, sessions,
+entitlements and Stripe Checkout. The static learner app remains zero-build.
+Learner progress stays in the browser; these changes do not clear or move it.
 
-**Ships dormant.** The frontend only talks to this when `js/config.js`'s
-`API_BASE` is set. Until then the live site is the exact free, no-account
-app (proven by `tests/monetisation.test.js`: "no backend → free, no throw").
+Tokens, authentication rate limits, accounts, sessions, entitlements and Stripe
+idempotency records live in D1. KV is no longer bound or used. A magic link is
+claimed atomically once, and expires after 15 minutes. Remote environments send
+links through Resend; only local development can use console email.
 
-Architecture note: magic-link tokens live in **KV** (TTL + single-use via
-delete); accounts/sessions/entitlements/stripe idempotency live in **D1**.
-No child PII, no progress sync, no benchmarking (deferred).
+## Local development and verification
 
----
-
-## What only YOU can do (external accounts/keys)
-
-These block a real deploy; everything else is built and tested.
-
-### 1. Cloudflare
-```bash
-cd worker
-npm install                       # installs wrangler (dev-only)
-npx wrangler login                # opens browser; authorises your account
-npx wrangler d1 create brightspark            # → copy database_id
-npx wrangler kv namespace create KV           # → copy id
-```
-Paste the returned ids into `wrangler.toml` (`database_id`, KV `id`). For
-staging/prod create separate D1/KV and fill `[env.staging]` / `[env.production]`.
-
-Apply the schema:
-```bash
-npm run migrate:local      # local dev DB
-# later: npm run migrate:staging ; npm run migrate:prod
-```
-
-### 2. Stripe (test mode first)
-- Create **3 Products/Prices** (one-time): "11+ Access" £34, "Family" £49,
-  "Annual" £39. Copy the three `price_…` ids into `wrangler.toml`
-  (`PRICE_ONEOFF/FAMILY/ANNUAL`, all envs).
-- **Settings → Tax**: enable **Stripe Tax** (handles VAT once you're
-  registered; the checkout already sends `automatic_tax[enabled]=true`).
-- **Developers → Webhooks**: add endpoint
-  `https://<your-worker-domain>/stripe/webhook`, event
-  `checkout.session.completed`. Copy the signing secret.
-- Set secrets (never commit these):
-```bash
-npx wrangler secret put STRIPE_SECRET           # sk_test_…
-npx wrangler secret put STRIPE_WEBHOOK_SECRET   # whsec_…
-# email provider (prod only; dev/staging use the console transport):
-npx wrangler secret put EMAIL_API_KEY           # e.g. Resend key
-```
-
-### 3. Email
-Dev/staging use `EMAIL_PROVIDER=console` — the magic link is printed in
-`wrangler dev` / `wrangler tail` logs (no real sends, fully testable
-offline). For prod set `EMAIL_PROVIDER=resend`, a verified `EMAIL_FROM`
-domain, and `EMAIL_API_KEY`.
-
----
-
-## Local development
+Use Node **22.13 or later**: the integration tests use built-in `node:sqlite`.
+Wrangler and the configuration TOML parser are development dependencies only.
 
 ```bash
 cd worker
+npm ci
 npm run migrate:local
-npx wrangler dev                      # Worker at http://localhost:8787
-# in another terminal, to exercise the webhook with no real charges:
-stripe listen --forward-to localhost:8787/stripe/webhook
+npm run dev
+# Separate terminal:
+npm test
+npm audit
+# From repository root:
+node tests/run-node.mjs
 ```
-Point the frontend at it: in `js/config.js` set
-`API_BASE = "http://localhost:8787"`, then serve the site
-(`python3 -m http.server 8000`) and open `http://localhost:8000/app.html`.
 
-Manual E2E (Stripe **test** mode, card `4242 4242 4242 4242`):
-`#/signup` → enter email + consent → grab the magic link from the
-`wrangler dev` log → it opens `#/verify/<token>` → lands on `#/account` →
-(with `PAYMENTS_ENABLED=true`) pick a plan → Stripe test checkout →
-`checkout.session.completed` → `/me` returns `paid:true` → premium unlocks.
+Default configuration targets `brightspark-local`, with a zero UUID sentinel,
+and uses `ENVIRONMENT=local`. Local migrations explicitly use `--local`.
+Point the frontend `API_BASE` in `js/config.js` at `http://localhost:8787`,
+serve the site on port 8000, and use console links from local development.
+Use Stripe test credentials locally; a local Stripe CLI listener can forward
+signed events to `http://localhost:8787/stripe/webhook`.
 
----
+## Environment boundaries
 
-## Tests
+| Setting | Local | Staging | Production |
+| --- | --- | --- | --- |
+| D1 | brightspark-local | brightspark-staging, dedicated | existing brightspark |
+| ENVIRONMENT | local | staging | production |
+| Email | console | resend | resend |
+| STRIPE_LIVE_MODE | false | false | true |
+| Payments | off | test mode on | off |
+| Auth email / IP / daily limits | 5 / 20 / 1000 | 5 / 20 / 100 | 5 / 20 / 1000 |
 
-- Worker core logic: `npm test` (plain `node --test`, no miniflare needed)
-  — covers token/hash, CORS, Stripe **signature verification**,
-  entitlement + `valid_until` mapping, idempotency helpers.
-- Client (from repo root): `node tests/run-node.mjs` — includes
-  `monetisation.test.js` proving the no-backend free path never throws.
+Staging uses its own provisioned D1 database and frontend at
+`https://brightspark-staging-site.brightspark.workers.dev`. The production
+database ID is retained; neither local configuration nor staging points to it.
+Each environment declares its variables explicitly because Wrangler does not
+inherit environment variables and resource bindings in the same way as other
+configuration settings.
 
----
+The `deploy:*` and remote `migrate:*` npm commands run `scripts/check-config.mjs`
+first. The guard parses TOML and rejects missing, zero or shared D1 IDs/names,
+staging production URLs, placeholder frontend URLs, remote console email,
+incorrect environment/Stripe modes and invalid authentication budgets. It also
+requires the magic-link destination to match an allowed HTTPS frontend origin.
+Use `npm run check:staging` or `npm run check:prod` to inspect configuration
+without making remote changes. Call the guarded npm commands for releases;
+direct Wrangler invocations bypass this repository-level guard.
 
-## Deploy & cutover
+## Security rollout procedure
+
+The staging database and frontend have been provisioned for the September 2026
+rollout. Follow the procedure below for production; provisioning steps apply
+when creating or replacing an environment. See the deployment record below
+for the current verified state:
+
+1. **Disable the old staging Worker before production rollout.** Its currently
+   deployed version may still write to the shared production D1/KV resources.
+   Remove its routes and disable its workers.dev endpoint, or delete the old
+   deployment after preserving any required operational evidence. A local TOML
+   edit does not disable an existing deployment. Verify it no longer accepts
+   requests or Stripe events.
+2. Back up production D1 and review accounts, entitlement records and Stripe
+   event provenance. Old staging/test data may already be mixed with production
+   records. Reconcile suspicious entitlements against actual Stripe live
+   transactions manually. Do not bulk-delete or revoke records based solely on
+   guessed timestamps, email addresses, or IDs: paid production records cannot
+   safely be inferred from this repository.
+3. Provision a dedicated staging D1 database (`wrangler d1 create
+   brightspark-staging`) and a staging frontend on a separate origin. Set its
+   returned UUID in `[env.staging.d1_databases]`; replace both staging `.invalid`
+   URLs. Keep the production D1 ID unchanged and staging Stripe mode false.
+4. Configure Resend with a verified sender. Set `EMAIL_API_KEY` separately for
+   staging and production. Set environment-specific `STRIPE_SECRET` and
+   `STRIPE_WEBHOOK_SECRET`: staging uses test keys/webhook endpoints; production
+   uses live keys/webhook endpoints. Keep secrets out of files and logs. Example:
+
+   ```bash
+   npx wrangler secret put EMAIL_API_KEY --env staging
+   npx wrangler secret put STRIPE_SECRET --env staging
+   npx wrangler secret put STRIPE_WEBHOOK_SECRET --env staging
+   # Repeat explicitly with --env production and production values.
+   ```
+
+5. Review and apply migrations including **`0002_security.sql`**, then deploy
+   the matching Worker to isolated staging:
+
+   ```bash
+   npm run check:staging
+   npm run migrate:staging
+   npm run deploy:staging
+   ```
+
+6. Verify single-use/expired links, concurrent redemption, email/IP/daily
+   limits, expired sessions, test-mode Stripe Checkout and webhook replay
+   rejection in staging. Ensure staging cannot read or modify production data
+   and that authentication tokens never appear in remote logs.
+7. Schedule the production migration and deploy together, after the old staging
+   deployment has been disabled and the production data audit is complete:
+
+   ```bash
+   npm run check:prod
+   npm run migrate:prod
+   npm run deploy:prod
+   ```
+
+   Production `PAYMENTS_ENABLED` remains **false** and `FREE_ERA` remains true.
+   Enabling real charges is a separate, deliberate launch change, including
+   review of live Stripe prices, tax settings, privacy/terms and Resend delivery.
+
+## Session and link transition
+
+The security migration marks pre-existing sessions with environment
+`legacy`. New sessions are scoped to the active environment, so **all parents
+must sign in again** after rollout. Existing emailed KV magic links are also
+invalidated: request a new link from the deployed version. This transition
+changes authentication only; it does not erase browser learner progress.
+
+Do not roll back to the old shared staging configuration or a Worker that
+accepts legacy sessions. Keep the production backup for deliberate recovery,
+and investigate rollout errors before restoring any previous code or data.
+
+## Security regression checks
+
+From the repository root, `npm ci && npm test` runs the existing 430 client
+checks plus DOM/import security regressions. In `worker/`, `npm ci && npm test`
+runs real SQLite-backed endpoint/transaction tests and deployment-guard checks.
+Run `npm audit` in both directories after dependency updates.
+
+For an additional local workerd/D1 check (needs permission to bind a loopback
+port), build without deploying and run the simulator against that bundle:
 
 ```bash
-# staging: CLOUD on, PAYMENTS on, Stripe TEST keys
-npm run migrate:staging && npm run deploy:staging
-# production: CLOUD on, PAYMENTS OFF until deliberate launch
-npm run migrate:prod && npm run deploy:prod
+cd worker
+npx wrangler deploy --env production --dry-run --outdir /tmp/brightspark-security-worker
+node scripts/security-runtime-smoke.mjs /tmp/brightspark-security-worker/index.js
 ```
-Cutover sequence (Stage C):
-1. Validate everything in **staging** (incl. cross-device + no-sharing —
-   see checklist).
-2. Set `js/config.js` `API_BASE` to the prod Worker URL; deploy the site.
-   Sign-in works; `/me` says `paid:false`; payments still **off** (so no
-   one is charged) — the app is unchanged for everyone, just sign-in-able.
-3. When ready to charge: flip `PAYMENTS_ENABLED="true"` in
-   `[env.production]`, redeploy the Worker. That is the revenue switch.
 
-`ALLOWED_ORIGIN` / `MAGIC_LINK_BASE` must match the site origin. If/when
-the site moves to **Cloudflare Pages** (recommended for private source +
-same-origin with this Worker), update both.
+The simulator has ephemeral local D1 storage and intercepts all outgoing email
+calls. It verifies migration application, concurrent token redemption, email
+limits, unpaid checkout rejection, failed-grant rollback, successful retry and
+idempotent replay. It does not use remote bindings or send real emails/payments.
+It loads bundle text directly because the bundled Miniflare 5 compatibility
+adapter's `scriptPath` handling failed at startup in this environment.
 
----
+Email limits use fixed 15-minute address/source windows and a UTC-day global
+budget. The source is Cloudflare's `CF-Connecting-IP`, with a shared restrictive
+fallback bucket if absent. Requests blocked by source/address limits do not
+consume the global budget. Attempted provider deliveries do, even if delivery
+fails. Default production caps are 5/address, 20/source and 1000/day; tune only
+with measured demand and mail budget. Console transport is restricted to
+explicit local mode on a loopback request hostname.
 
-## Verification checklist (the requirements that drove this design)
+Configure Stripe webhook subscriptions for both `checkout.session.completed`
+and `checkout.session.async_payment_succeeded`. Entitlements require a signed,
+mode-matching `payment` Checkout Session with `payment_status=paid`. The
+checkout ID prevents two different events granting the same purchase twice;
+the grant and deduplication records commit or roll back together.
 
-- [ ] Magic token is single-use (second `/auth/verify` with same token → 400)
-      and expires after 15 min.
-- [ ] `/me` with no/expired session → `401 {authenticated:false,paid:false}`.
-- [ ] Webhook rejects a bad/absent `Stripe-Signature`; a replayed event id
-      is ignored (idempotent).
-- [ ] **Cross-device:** pay on device A → sign in on device B → `paid:true`
-      (entitlement follows the account, not the device).
-- [ ] **No key sharing:** there is no shareable key — access requires the
-      emailed magic link → a server session; sharing a URL grants nothing.
-- [ ] With `API_BASE=""` the site is byte-for-byte the free app
-      (`node tests/run-node.mjs` green; `#/signup` shows "coming soon").
-- [ ] `PAYMENTS_ENABLED=false` → `/checkout` returns `403 {disabled:true}`
-      and the Account screen shows "payments aren't live yet".
+## September 2026 deployment record
+
+- PR: https://github.com/kherhim/brightspark-11plus/pull/2
+- No old staging Worker existed in the Cloudflare inventory at rollout start.
+- Production D1 exported before changes; a restricted local backup and a
+  separate entitlement-provenance audit are excluded from Git.
+- The historical active entitlement matched a paid Stripe test-mode Checkout
+  Session. Its record was preserved; review it before enabling monetisation.
+- Dedicated staging D1 provisioned and migrations 0001/0002 applied.
+- Staging frontend: https://brightspark-staging-site.brightspark.workers.dev
+- Staging API: https://brightspark-worker-staging.brightspark.workers.dev
+- Staging concurrent redemption returned one success and three rejected
+  replays. A real Stripe sandbox Checkout completed and its webhook granted
+  the staging-only entitlement.
+- The restricted staging Resend key is configured. A delivered staging link
+  signed into the expected account; reusing it was rejected.
+- Production migration 0002 applied; Worker version
+  `044a7c77-b198-4220-a5ec-1e87fd62f904` deployed successfully.
+- Production smoke checks confirm free access on, payments off, malformed
+  tokens rejected and legacy sessions rejected.
+- Two obsolete Stripe test-mode webhooks targeting production were disabled.
+  The dedicated staging test webhook remains enabled.
+- Frontend publication follows the merge of PR #2 through GitHub Pages.
+
+To prepare/redeploy the isolated staging frontend:
+
+```bash
+cd worker
+node scripts/prepare-staging-site.mjs
+npx wrangler deploy --config staging-site.toml
+```
+
+Only public assets are copied into the ignored `.staging-site/` directory; its
+API base is changed in that generated copy. Production source configuration is
+untouched. Staging responses request no indexing and no caching.

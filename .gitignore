@@ -11,3 +11,7 @@ worker/.dev.vars
 *.env
 *.env.local
 worker/.env
+
+# Local-only rollout backups and generated staging assets
+.security-backups/
+worker/.staging-site/

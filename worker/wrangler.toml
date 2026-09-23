@@ -1,8 +1,8 @@
 # Brightspark Prep monetisation Worker.
 #
-# This file is checked in WITHOUT real ids/secrets. The owner fills the
-# binding ids after creating D1/KV (see worker/README.md), and sets secrets
-# with `wrangler secret put` (NEVER commit secrets here).
+# Database IDs are not secrets. Production retains its existing database;
+# local and unprovisioned staging use a zero UUID that cannot target it.
+# Secrets belong in `wrangler secret put --env ...`, never this file.
 
 name = "brightspark-worker"
 main = "src/index.js"
@@ -12,6 +12,11 @@ workers_dev = true
 # Non-secret config (safe to commit). Secrets go via `wrangler secret put`:
 #   STRIPE_SECRET, STRIPE_WEBHOOK_SECRET, EMAIL_API_KEY
 [vars]
+ENVIRONMENT = "local"
+STRIPE_LIVE_MODE = "false"
+AUTH_EMAIL_LIMIT = "5"
+AUTH_IP_LIMIT = "20"
+AUTH_DAILY_LIMIT = "1000"
 ALLOWED_ORIGIN = "http://localhost:8000"        # CSV of allowed site origins
 MAGIC_LINK_BASE = "http://localhost:8000/app.html"  # where /auth/verify link points
 EMAIL_FROM = "Brightspark Prep <no-reply@example.com>"
@@ -36,23 +41,23 @@ FREE_ERA = "true"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "brightspark"
-database_id = "3ac83cda-cd45-43b0-b714-42d49954868c"
+database_name = "brightspark-local"
+database_id = "00000000-0000-0000-0000-000000000000"
 migrations_dir = "migrations"
 
-[[kv_namespaces]]
-binding = "KV"
-id = "5cbabf3655374aba8ef2981ee32d9743"
-
-# --- Staging: cloud on, payments off, real Stripe TEST keys -------------
+# --- Staging: dedicated resources required before remote use -----------
 [env.staging]
 workers_dev = true
 [env.staging.vars]
-# Custom domain primary; github.io kept as defensive transition fallback
-# (can be removed after the custom-domain cutover has bedded in).
-ALLOWED_ORIGIN = "https://brightsparkprep.com,https://www.brightsparkprep.com,https://kherhim.github.io"
-MAGIC_LINK_BASE = "https://brightsparkprep.com/app.html"
-EMAIL_PROVIDER = "console"
+ENVIRONMENT = "staging"
+STRIPE_LIVE_MODE = "false"
+AUTH_EMAIL_LIMIT = "5"
+AUTH_IP_LIMIT = "20"
+AUTH_DAILY_LIMIT = "100"
+# Dedicated staging frontend and database; never reuse production bindings.
+ALLOWED_ORIGIN = "https://brightspark-staging-site.brightspark.workers.dev"
+MAGIC_LINK_BASE = "https://brightspark-staging-site.brightspark.workers.dev/app.html"
+EMAIL_PROVIDER = "resend"
 EMAIL_FROM = "Brightspark Prep <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-22"
 PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
@@ -64,16 +69,11 @@ ACCESS_DAYS_ANNUAL = "365"
 FAMILY_SEATS = "3"
 PAYMENTS_ENABLED = "true"
 FREE_ERA = "true"
-# Single shared infra for launch: staging/prod reuse the one D1+KV.
-# (Split into dedicated -staging/-prod resources before real-money scale.)
 [[env.staging.d1_databases]]
 binding = "DB"
-database_name = "brightspark"
-database_id = "3ac83cda-cd45-43b0-b714-42d49954868c"
+database_name = "brightspark-staging"
+database_id = "f0b341e9-4a16-45da-bf1a-f51fe7387275"
 migrations_dir = "migrations"
-[[env.staging.kv_namespaces]]
-binding = "KV"
-id = "5cbabf3655374aba8ef2981ee32d9743"
 
 # --- Production: cloud on, PAYMENTS OFF until deliberate launch ---------
 # workers_dev on: the public site (github.io) calls this cross-origin, so
@@ -81,6 +81,11 @@ id = "5cbabf3655374aba8ef2981ee32d9743"
 [env.production]
 workers_dev = true
 [env.production.vars]
+ENVIRONMENT = "production"
+STRIPE_LIVE_MODE = "true"
+AUTH_EMAIL_LIMIT = "5"
+AUTH_IP_LIMIT = "20"
+AUTH_DAILY_LIMIT = "1000"
 # Custom domain primary; github.io kept as defensive transition fallback
 # (remove after custom-domain cutover has bedded in).
 ALLOWED_ORIGIN = "https://brightsparkprep.com,https://www.brightsparkprep.com,https://kherhim.github.io"
@@ -106,6 +111,3 @@ binding = "DB"
 database_name = "brightspark"
 database_id = "3ac83cda-cd45-43b0-b714-42d49954868c"
 migrations_dir = "migrations"
-[[env.production.kv_namespaces]]
-binding = "KV"
-id = "5cbabf3655374aba8ef2981ee32d9743"

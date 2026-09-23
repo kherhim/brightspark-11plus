@@ -4,7 +4,7 @@
 // Review answers are real graded practice (they help mastery), and each
 // item's Leitner box is moved by THIS attempt's result.
 
-import { h, button, clear, paywallCard } from "./components.js";
+import { escapeHTML, h, button, clear, paywallCard } from "./components.js";
 import { featureAllowed } from "../entitlement.js";
 import { renderSolution, correctAnswerText } from "./screenQuiz.js";
 import {
@@ -47,7 +47,7 @@ export function renderReview(ctx) {
     const card = h("div", { class: "card" }, [
       h("div", { class: "quiz-meta" }, [
         h("span", {
-          html: `<b>${t ? t.name : q.topicId}</b> · Level ${q.level}`,
+          html: `<b>${escapeHTML(t ? t.name : q.topicId)}</b> · Level ${escapeHTML(q.level)}`,
         }),
         h("span", { class: "muted", text: (extra && extra.meta) || "" }),
       ]),
@@ -95,7 +95,7 @@ export function renderReview(ctx) {
             ? q.misconceptions[chosen.misconceptionId]
             : null;
         if (why) fb.appendChild(h("p", { class: "why", text: why }));
-        renderSolution(q, correctText).forEach((n) => fb.appendChild(n));
+        renderSolution(q).forEach((n) => fb.appendChild(n));
       } else if (q.keyConcept) {
         fb.appendChild(
           h("div", { class: "concept", html: "💡 " + q.keyConcept })
@@ -340,8 +340,8 @@ export function renderReview(ctx) {
           h("div", { class: "feedback bad" }, [
             h("h3", { text: "One slip keeps coming back" }),
             h("p", {
-              html: `${who || "You"} made the same kind of mistake <b>${
-                dom.count
+              html: `${escapeHTML(who || "You")} made the same kind of mistake <b>${
+                escapeHTML(dom.count)
               }</b> times${
                 fx.title ? ` — <b>${fx.title}</b>` : ""
               }. A two-minute fix-it plus a short drill clears it up.`,

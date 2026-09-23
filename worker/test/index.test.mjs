@@ -1,5 +1,5 @@
 // Integration test for the Worker request router — drives src/index.js
-// end to end with in-memory D1/KV fakes (no wrangler/Cloudflare/Stripe
+// end to end with real in-memory SQLite behind the D1 API (no Cloudflare/Stripe
 // network). Exercises the full magic-link → session → entitlement →
 // Stripe-webhook flow plus the security edges.
 
@@ -9,133 +9,11 @@ import worker from "../src/index.js";
 
 const enc = new TextEncoder();
 
-function makeEnv(overrides = {}) {
-  const accounts = new Map(); // email -> row
-  const sessions = new Map(); // session_id -> row
-  const entitlements = new Map(); // account_id -> row
-  const events = new Set(); // stripe event ids
-  const kv = new Map();
-  const byId = (id) =>
-    [...accounts.values()].find((a) => a.account_id === id) || null;
-
-  const DB = {
-    prepare(sql) {
-      return {
-        bind(...p) {
-          return {
-            async first() {
-              if (sql.includes("FROM accounts WHERE email"))
-                return accounts.has(p[0])
-                  ? { account_id: accounts.get(p[0]).account_id }
-                  : null;
-              if (sql.includes("FROM sessions s JOIN accounts a")) {
-                const s = sessions.get(p[0]);
-                if (!s) return null;
-                const a = byId(s.account_id);
-                return {
-                  account_id: s.account_id,
-                  expires_at: s.expires_at,
-                  email: a && a.email,
-                };
-              }
-              if (sql.includes("FROM entitlements WHERE account_id")) {
-                const e = entitlements.get(p[0]);
-                return e
-                  ? {
-                      plan: e.plan,
-                      status: e.status,
-                      seats: e.seats,
-                      valid_until: e.valid_until,
-                    }
-                  : null;
-              }
-              if (sql.includes("FROM stripe_events"))
-                return events.has(p[0]) ? { event_id: p[0] } : null;
-              return null;
-            },
-            async run() {
-              if (sql.includes("INSERT INTO accounts"))
-                accounts.set(p[1], {
-                  account_id: p[0],
-                  email: p[1],
-                  created_at: p[2],
-                  consent_at: p[3],
-                  consent_version: p[4],
-                });
-              else if (sql.includes("INSERT INTO entitlements"))
-                entitlements.set(p[0], {
-                  account_id: p[0],
-                  plan: null,
-                  status: "none",
-                  seats: 1,
-                  valid_until: null,
-                });
-              else if (sql.includes("INSERT INTO sessions"))
-                sessions.set(p[0], {
-                  session_id: p[0],
-                  account_id: p[1],
-                  created_at: p[2],
-                  expires_at: p[3],
-                });
-              else if (sql.includes("DELETE FROM sessions"))
-                sessions.delete(p[0]);
-              else if (sql.includes("INSERT INTO stripe_events"))
-                events.add(p[0]);
-              else if (sql.includes("UPDATE entitlements SET"))
-                entitlements.set(p[6], {
-                  account_id: p[6],
-                  plan: p[0],
-                  status: p[1],
-                  seats: p[2],
-                  valid_until: p[3],
-                  stripe_customer: p[4],
-                });
-              return { success: true };
-            },
-          };
-        },
-      };
-    },
-  };
-
-  const KV = {
-    async get(k) {
-      return kv.has(k) ? kv.get(k) : null;
-    },
-    async put(k, v) {
-      kv.set(k, v);
-    },
-    async delete(k) {
-      kv.delete(k);
-    },
-  };
-
-  return {
-    DB,
-    KV,
-    _state: { accounts, sessions, entitlements, events, kv },
-    ALLOWED_ORIGIN: "http://localhost:8000",
-    MAGIC_LINK_BASE: "http://localhost:8000/app.html",
-    CONSENT_VERSION: "2026-05-19",
-    EMAIL_PROVIDER: "console",
-    EMAIL_FROM: "x <no-reply@example.com>",
-    PRICE_ONEOFF: "price_one",
-    PRICE_FAMILY: "price_fam",
-    PRICE_ANNUAL: "price_ann",
-    ACCESS_DAYS_ONEOFF: "1095",
-    ACCESS_DAYS_FAMILY: "1095",
-    ACCESS_DAYS_ANNUAL: "365",
-    FAMILY_SEATS: "3",
-    PAYMENTS_ENABLED: "false",
-    STRIPE_WEBHOOK_SECRET: "whsec_test",
-    STRIPE_SECRET: "sk_test_unused",
-    ...overrides,
-  };
-}
+import { makeEnv } from "./helpers/env.mjs";
 
 const ORIGIN = "http://localhost:8000";
 const req = (path, opts = {}) =>
-  new Request("https://api.test" + path, {
+  new Request("http://localhost:8787" + path, {
     headers: { Origin: ORIGIN, ...(opts.headers || {}) },
     ...opts,
   });
@@ -295,8 +173,10 @@ test("full flow: magic-link → session → /me → webhook → paid (idempotent
   const payload = JSON.stringify({
     id: "evt_1",
     type: "checkout.session.completed",
+    livemode: false,
     data: {
       object: {
+        id: "cs_1", mode: "payment", payment_status: "paid", livemode: false,
         client_reference_id: accountId,
         customer: "cus_1",
         metadata: { account_id: accountId, plan: "oneoff" },

@@ -1,0 +1,6 @@
+name = "brightspark-staging-site"
+compatibility_date = "2025-01-01"
+workers_dev = true
+[assets]
+directory = "./.staging-site"
+html_handling = "none"

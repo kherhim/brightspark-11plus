@@ -54,10 +54,9 @@ STRIPE_LIVE_MODE = "false"
 AUTH_EMAIL_LIMIT = "5"
 AUTH_IP_LIMIT = "20"
 AUTH_DAILY_LIMIT = "100"
-# Replace with a separately provisioned frontend. The remote guard rejects
-# these placeholders and the zero database ID until staging is isolated.
-ALLOWED_ORIGIN = "https://brightspark-staging.invalid"
-MAGIC_LINK_BASE = "https://brightspark-staging.invalid/app.html"
+# Dedicated staging frontend and database; never reuse production bindings.
+ALLOWED_ORIGIN = "https://brightspark-staging-site.brightspark.workers.dev"
+MAGIC_LINK_BASE = "https://brightspark-staging-site.brightspark.workers.dev/app.html"
 EMAIL_PROVIDER = "resend"
 EMAIL_FROM = "Brightspark Prep <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-22"
@@ -73,7 +72,7 @@ FREE_ERA = "true"
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "brightspark-staging"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "f0b341e9-4a16-45da-bf1a-f51fe7387275"
 migrations_dir = "migrations"
 
 # --- Production: cloud on, PAYMENTS OFF until deliberate launch ---------

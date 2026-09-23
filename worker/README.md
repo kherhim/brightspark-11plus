@@ -37,16 +37,16 @@ signed events to `http://localhost:8787/stripe/webhook`.
 
 | Setting | Local | Staging | Production |
 | --- | --- | --- | --- |
-| D1 | brightspark-local | brightspark-staging, must provision | existing brightspark |
+| D1 | brightspark-local | brightspark-staging, dedicated | existing brightspark |
 | ENVIRONMENT | local | staging | production |
 | Email | console | resend | resend |
 | STRIPE_LIVE_MODE | false | false | true |
 | Payments | off | test mode on | off |
 | Auth email / IP / daily limits | 5 / 20 / 1000 | 5 / 20 / 100 | 5 / 20 / 1000 |
 
-Staging deliberately has a zero database UUID and `.invalid` frontend URLs.
-**It is not ready for remote deployment or migration.** The production database
-ID is retained; neither the default configuration nor staging points to it.
+Staging uses its own provisioned D1 database and frontend at
+`https://brightspark-staging-site.brightspark.workers.dev`. The production
+database ID is retained; neither local configuration nor staging points to it.
 Each environment declares its variables explicitly because Wrangler does not
 inherit environment variables and resource bindings in the same way as other
 configuration settings.
@@ -60,10 +60,12 @@ Use `npm run check:staging` or `npm run check:prod` to inspect configuration
 without making remote changes. Call the guarded npm commands for releases;
 direct Wrangler invocations bypass this repository-level guard.
 
-## Required security rollout: remote work remains outstanding
+## Security rollout procedure
 
-No remote resources, secrets, migrations or deployments are created by the
-local implementation. Complete these steps as an explicitly authorized rollout:
+The staging database and frontend have been provisioned for the September 2026
+rollout. Follow the procedure below for production; provisioning steps apply
+when creating or replacing an environment. See the deployment record below
+for the current verified state:
 
 1. **Disable the old staging Worker before production rollout.** Its currently
    deployed version may still write to the shared production D1/KV resources.
@@ -167,3 +169,32 @@ and `checkout.session.async_payment_succeeded`. Entitlements require a signed,
 mode-matching `payment` Checkout Session with `payment_status=paid`. The
 checkout ID prevents two different events granting the same purchase twice;
 the grant and deduplication records commit or roll back together.
+
+## September 2026 deployment record
+
+- PR: https://github.com/kherhim/brightspark-11plus/pull/2
+- No old staging Worker existed in the Cloudflare inventory at rollout start.
+- Production D1 exported before changes; a restricted local backup and a
+  separate entitlement-provenance audit are excluded from Git.
+- The historical active entitlement matched a paid Stripe test-mode Checkout
+  Session. Its record was preserved; review it before enabling monetisation.
+- Dedicated staging D1 provisioned and migrations 0001/0002 applied.
+- Staging frontend: https://brightspark-staging-site.brightspark.workers.dev
+- Staging API: https://brightspark-worker-staging.brightspark.workers.dev
+- Staging concurrent redemption returned one success and three rejected
+  replays. A real Stripe sandbox Checkout completed and its webhook granted
+  the staging-only entitlement.
+- Production migration, Worker rollout and frontend publication are pending
+  the remaining staging email check. Production payments stay off.
+
+To prepare/redeploy the isolated staging frontend:
+
+```bash
+cd worker
+node scripts/prepare-staging-site.mjs
+npx wrangler deploy --config staging-site.toml
+```
+
+Only public assets are copied into the ignored `.staging-site/` directory; its
+API base is changed in that generated copy. Production source configuration is
+untouched. Staging responses request no indexing and no caching.

@@ -78,11 +78,10 @@ test('remote guard rejects unspecified or local environment', () => {
   }
 });
 
-test('checked-in configuration blocks unprovisioned staging and permits production preflight only', () => {
+test('checked-in configuration permits both isolated remote environments', () => {
   const script = new URL('../scripts/check-config.mjs', import.meta.url);
   const production = spawnSync(process.execPath, [script.pathname, 'production'], { encoding: 'utf8' });
   assert.equal(production.status, 0, production.stderr);
   const staging = spawnSync(process.execPath, [script.pathname, 'staging'], { encoding: 'utf8' });
-  assert.equal(staging.status, 1);
-  assert.match(staging.stderr, /Provision a dedicated staging D1 database/);
+  assert.equal(staging.status, 0, staging.stderr);
 });

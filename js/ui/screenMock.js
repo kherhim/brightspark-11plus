@@ -3,7 +3,7 @@
 // submit it writes one mock record (muted into progress — never moves the
 // practice ladder) and shows a results report with every worked solution.
 
-import { h, button, clear, levelDots, paywallCard } from "./components.js";
+import { escapeHTML, h, button, clear, levelDots, paywallCard } from "./components.js";
 import { featureAllowed } from "../entitlement.js";
 import { renderSolution, correctAnswerText } from "./screenQuiz.js";
 import { getQuestion } from "../questionFactory.js";
@@ -450,8 +450,8 @@ export function renderMock(ctx, params) {
         h("div", { class: "quiz-meta" }, [
           h("span", {
             html: `<b>Q${i + 1}</b> · ${
-              topicById(r.topicId)?.name || r.topicId
-            } · Level ${r.level}`,
+              escapeHTML(topicById(r.topicId)?.name || r.topicId)
+            } · Level ${escapeHTML(r.level)}`,
           }),
           h("span", {
             class:
@@ -468,7 +468,7 @@ export function renderMock(ctx, params) {
         }),
       ]);
       const sol = h("div", { class: "feedback " + (ok ? "good" : "bad") });
-      renderSolution(q, r.correctText).forEach((n) => sol.appendChild(n));
+      renderSolution(q).forEach((n) => sol.appendChild(n));
       card.appendChild(sol);
       mount.appendChild(card);
     });

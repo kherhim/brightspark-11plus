@@ -1,4 +1,4 @@
-import { h, button, clear } from "./components.js";
+import { escapeHTML, h, button, clear } from "./components.js";
 import { hasBackend, serverConfig } from "../config.js";
 import { isSignedIn, requestLink } from "../auth.js";
 
@@ -67,7 +67,7 @@ export function renderSignup(ctx, params) {
         h("h1", { text: "Check your email 📧" }),
         h("p", {
           class: "muted",
-          html: `If <b>${addr}</b> is valid, a one-time sign-in link is on its way (valid 15 minutes). Open it on this device.`,
+          html: `If <b>${escapeHTML(addr)}</b> is valid, a one-time sign-in link is on its way (valid 15 minutes). Open it on this device.`,
         }),
         button("Use a different email", () => ctx.navigate("signup"), "btn secondary"),
       ])
@@ -85,7 +85,7 @@ export function renderSignup(ctx, params) {
       h("label", { class: "consent", for: "consent" }, [
         consent,
         h("span", {
-          html: ` I'm the parent/guardian and I agree to the <a href="./terms.html" target="_blank" rel="noopener">terms</a> &amp; <a href="./privacy.html" target="_blank" rel="noopener">privacy notice</a> (v${consentV}).`,
+          html: ` I'm the parent/guardian and I agree to the <a href="./terms.html" target="_blank" rel="noopener">terms</a> &amp; <a href="./privacy.html" target="_blank" rel="noopener">privacy notice</a> (v${escapeHTML(consentV)}).`,
         }),
       ]),
       h("div", { class: "btn-row" }, [

@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/run-node.mjs && node --test tests/security.test.mjs",
+    "test:security": "node --test tests/security.test.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

@@ -1,4 +1,4 @@
-import { h, button, clear } from "./components.js";
+import { escapeHTML, h, button, clear } from "./components.js";
 import { hasBackend, paymentsEnabled, freeEra } from "../config.js";
 import { isSignedIn, logout, startCheckout } from "../auth.js";
 import { refreshEntitlement, account, isPaid } from "../entitlement.js";
@@ -48,13 +48,17 @@ export function renderAccount(ctx, params) {
     clear(mount);
     const acc = account();
 
-    if (flag === "paid") {
+    if (flag === "paid" && isPaid()) {
       mount.appendChild(
         h("div", { class: "card center" }, [
           h("h1", { text: "You're all set 🎉" }),
           h("p", { class: "muted", text: "Payment received — full access is unlocked. Thank you for supporting an indie tool!" }),
         ])
       );
+    } else if (flag === "paid") {
+      mount.appendChild(h("div", { class: "card" }, [
+        h("p", { class: "muted", text: "Your payment has not been confirmed yet. Please refresh your account shortly to check your access." }),
+      ]));
     } else if (flag === "cancelled") {
       mount.appendChild(
         h("div", { class: "card" }, [
@@ -65,7 +69,7 @@ export function renderAccount(ctx, params) {
 
     const rows = [
       h("h1", { text: "Your account" }),
-      h("p", { html: `Signed in as <b>${(acc && acc.email) || "—"}</b>.` }),
+      h("p", { html: `Signed in as <b>${escapeHTML((acc && acc.email) || "—")}</b>.` }),
     ];
 
     if (isPaid()) {
@@ -75,7 +79,7 @@ export function renderAccount(ctx, params) {
       rows.push(
         h("p", {
           html: `Plan: <b>full access</b>${
-            acc && acc.plan ? ` (${acc.plan})` : ""
+            acc && acc.plan ? ` (${escapeHTML(acc.plan)})` : ""
           }${until ? ` — valid until <b>${until}</b>` : ""}.`,
         }),
         h("p", { class: "muted", text: "All four subjects, mocks, smart review, analytics and worksheets are unlocked on this and any device you sign in on." })

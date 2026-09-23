@@ -1,6 +1,14 @@
 // Tiny DOM helpers — no framework. `h` builds elements; the rest are
 // reusable bits of UI (buttons, progress bars, mastery badges).
 
+// Only for untrusted text embedded inside authored HTML. Question-bank HTML
+// deliberately remains markup at its existing rendering boundaries.
+export function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[c]);
+}
+
 export function h(tag, props = {}, children = []) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(props)) {

@@ -1,4 +1,4 @@
-import { h, button, levelDots, clear, paywallCard } from "./components.js";
+import { escapeHTML, h, button, levelDots, clear, paywallCard } from "./components.js";
 import { TOPICS, topicById } from "../topics.js";
 import {
   fullAccess,
@@ -19,7 +19,7 @@ export { correctAnswerText };
 // solution and key idea. Shared by the quiz feedback and the mock report
 // so both show identical solutions. Returns an array of DOM nodes.
 export function renderSolution(q, correctText) {
-  if (correctText == null) correctText = correctAnswerText(q);
+  correctText = correctText == null ? correctAnswerText(q) : escapeHTML(correctText);
   const nodes = [
     h("p", { html: `The correct answer is <b>${correctText}</b>.` }),
   ];
@@ -103,7 +103,7 @@ export function renderQuiz(ctx, params) {
 
     const meta = h("div", { class: "quiz-meta" }, [
       h("span", {
-        html: `<b>${t ? t.name : current.topicId}</b> · Level ${current.level}/6${
+        html: `<b>${escapeHTML(t ? t.name : current.topicId)}</b> · Level ${escapeHTML(current.level)}/6${
           current.graded ? "" : " · easier practice"
         }`,
       }),
@@ -226,7 +226,7 @@ export function renderQuiz(ctx, params) {
           ? q.misconceptions[chosen.misconceptionId]
           : null;
       if (why) fb.appendChild(h("p", { class: "why", text: why }));
-      renderSolution(q, correctText).forEach((n) => fb.appendChild(n));
+      renderSolution(q).forEach((n) => fb.appendChild(n));
     }
 
     const row = h("div", { class: "btn-row" });

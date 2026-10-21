@@ -15,3 +15,7 @@ worker/.env
 # Local-only rollout backups and generated staging assets
 .security-backups/
 worker/.staging-site/
+# Generated production site (built by scripts/build-site.mjs)
+dist/
+# Local editor/agent tooling
+.serena/

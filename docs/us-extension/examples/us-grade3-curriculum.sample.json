@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "draft-1",
+  "curriculumId": "us-elementary",
+  "curriculumVersion": "draft-2026-09",
+  "publicationStatus": "draft",
+  "proposedGrade": "3",
+  "gradeChoiceConfirmed": false,
+  "subjects": ["math", "science", "social-studies"],
+  "note": "Illustrative authoring contract only. These are not implemented lessons, reviewed mappings or complete grade coverage.",
+  "skills": [
+    {
+      "id": "us.math.fractions.unit-fraction",
+      "contentVersion": "draft-1",
+      "subject": "math",
+      "gradeBand": ["3"],
+      "objective": "Connect one equal part of a whole to its unit-fraction notation.",
+      "prerequisites": [],
+      "prerequisiteReview": "required",
+      "standardMappings": [
+        {
+          "authority": "Common Core",
+          "reference": "3.NF.A.1",
+          "url": "https://www.thecorestandards.org/Math/Content/3/NF/",
+          "reviewStatus": "proposed",
+          "coverage": "partial"
+        }
+      ],
+      "representations": ["area-model", "fraction-notation"],
+      "activityTypes": ["select-region", "mcq", "worked-example"],
+      "constraints": {"allowedDenominators": [2, 3, 4, 6, 8], "sameWholeRequired": true},
+      "misconceptions": [
+        {"id": "counts-unequal-parts", "diagnosticPolicy": "Use an additional equal-versus-unequal partition task before confirming the hypothesis."}
+      ],
+      "evidencePolicy": {"assistedAnswersEstablishIndependence": false, "requireFreshRepresentation": true, "delayedCheckRequiredForRetentionClaim": true},
+      "publicationStatus": "draft",
+      "reviews": []
+    },
+    {
+      "id": "us.science.forces.investigation-evidence",
+      "contentVersion": "draft-1",
+      "subject": "science",
+      "gradeBand": ["3"],
+      "objective": "Use observations from a controlled comparison to explain how pushes affect motion.",
+      "prerequisites": [],
+      "prerequisiteReview": "required",
+      "standardMappings": [
+        {
+          "authority": "NGSS",
+          "reference": "3-PS2-1",
+          "url": "https://www.nextgenscience.org/pe/3-ps2-1-motion-and-stability-forces-and-interactions",
+          "reviewStatus": "proposed",
+          "coverage": "partial"
+        }
+      ],
+      "representations": ["observation-table", "motion-model"],
+      "activityTypes": ["predict-observe-explain", "short-response"],
+      "constraints": {"forceComparison": "qualitative", "variablesChangedPerComparison": 1, "simulationIsNotFullInvestigationEvidence": true},
+      "scienceDimensions": {"coreIdea": "PS2.A", "practice": "Planning and carrying out investigations", "crosscuttingConcept": "Cause and effect", "reviewStatus": "proposed"},
+      "misconceptions": [],
+      "evidencePolicy": {"assistedAnswersEstablishIndependence": false, "openResponsesRequireRubric": true, "uncertainFeedbackCanRemainUnscored": true},
+      "publicationStatus": "draft",
+      "reviews": []
+    },
+    {
+      "id": "us.social-studies.community.map-change",
+      "contentVersion": "draft-1",
+      "subject": "social-studies",
+      "gradeBand": ["3"],
+      "objective": "Use two dated maps to describe a community change and identify supporting evidence.",
+      "prerequisites": [],
+      "prerequisiteReview": "required",
+      "standardMappings": [],
+      "referenceState": null,
+      "referenceStateStatus": "founder-decision-required",
+      "candidateFrameworkUrl": "https://www.cde.ca.gov/ci/HS/cf/hssframework.asp",
+      "representations": ["map", "timeline"],
+      "activityTypes": ["source-comparison", "short-response"],
+      "constraints": {"datedSourcesRequired": true, "rightsMetadataRequired": true, "opinionAgreementIsNotCorrectness": true},
+      "sources": [],
+      "misconceptions": [],
+      "evidencePolicy": {"assistedAnswersEstablishIndependence": false, "openResponsesRequireRubric": true, "uncertainFeedbackCanRemainUnscored": true},
+      "publicationStatus": "draft",
+      "reviews": []
+    }
+  ]
+}

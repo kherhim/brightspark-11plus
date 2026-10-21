@@ -197,11 +197,14 @@ the grant and deduplication records commit or roll back together.
 To prepare/redeploy the isolated staging frontend:
 
 ```bash
+npm ci                     # repository root: installs the site build tool
 cd worker
 node scripts/prepare-staging-site.mjs
 npx wrangler deploy --config staging-site.toml
 ```
 
-Only public assets are copied into the ignored `.staging-site/` directory; its
+The staging site uses the same production build as Pages
+(`scripts/build-site.mjs`): only allowlisted public assets, bundled and
+minified, are written into the ignored `.staging-site/` directory, and the
 API base is changed in that generated copy. Production source configuration is
 untouched. Staging responses request no indexing and no caching.

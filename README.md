@@ -80,7 +80,9 @@ python3 -m http.server 8000
 
 Then open <http://localhost:8000/> in any modern browser: `/` is the
 **landing page** and `/app.html` is the **practice app** (`/app.html#/home`
-etc.). No build step, no dependencies.
+etc.). Development needs no build step: the browser loads the ES modules
+directly. To preview exactly what production serves, run `npm ci && npm run
+build` and serve `dist/` instead.
 
 ## Privacy
 
@@ -99,21 +101,26 @@ on the other device.
 
 ## Deploy (GitHub Pages)
 
-It's a zero-build static site, so any static host works. For GitHub Pages:
+Production is published by GitHub Actions (`.github/workflows/pages.yml`),
+not from the repository root. Every pull request runs the client, build and
+Worker tests and builds the site; a merge to `main` additionally deploys it.
 
-```bash
-git add -A && git commit -m "…" && git push
-```
+`npm run build` (`scripts/build-site.mjs`) writes an allowlisted site to the
+ignored `dist/` directory: the four HTML pages, `CNAME`, minified
+`style.css`, minified `data/*.json`, and the app's ES modules bundled and
+minified into a single `js/main.js`. Docs, tests, the Worker, notes and
+package files are never published; the build fails if anything else appears.
 
-Pages redeploys automatically in ~1 minute. All paths are relative and
-`.nojekyll` is committed, so the project sub-path URL works with no extra
-config.
+Rollback to the old root-served setup (emergency only):
+`gh api -X PUT repos/kherhim/brightspark-11plus/pages -f build_type=legacy -f 'source[branch]=main' -f 'source[path]=/'`.
 
 ## Run the tests
 
 - **In a browser** (full suite, incl. the curated bank): start the server
   above and open <http://localhost:8000/tests/test.html>.
 - **In Node** (logic only, fast): `node tests/run-node.mjs`
+- **Everything in Node** (logic, security and production-build checks, including
+  a boot of the built bundle in jsdom): `npm ci && npm test`
 
 The suite checks every generator at every level (valid structure, clean
 answers, unique multiple-choice options, deterministic from a seed —
@@ -163,7 +170,9 @@ js/ui/  router · components · screenHome · screenQuiz · screenMock ·
         screenReview · screenTopics · screenWorksheet · screenParent
 data/  curated.json · fixits.json
 tests/  test.html · harness · *.test.js (migration, mock, review, analytics,
-        engagement, boards, print, …) · run-node.mjs
+        engagement, boards, print, …) · run-node.mjs · security/build tests
+scripts/build-site.mjs   production build into dist/ (bundle + minify)
+.github/workflows/pages.yml   test, build and deploy dist/ to Pages
 ```
 
 The app never touches `localStorage` directly — every screen goes through

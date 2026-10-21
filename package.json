@@ -2,10 +2,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/run-node.mjs && node --test tests/security.test.mjs",
-    "test:security": "node --test tests/security.test.mjs"
+    "test": "node tests/run-node.mjs && node --test tests/security.test.mjs tests/build.test.mjs",
+    "test:security": "node --test tests/security.test.mjs",
+    "test:build": "node --test tests/build.test.mjs",
+    "build": "node scripts/build-site.mjs --report"
   },
   "devDependencies": {
+    "esbuild": "0.25.10",
     "jsdom": "^29.1.1"
+  },
+  "engines": {
+    "node": ">=22.13.0"
   }
 }

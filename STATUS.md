@@ -1,6 +1,6 @@
 # Brightspark Prep — Project Status
 
-_Last updated: 2026-09-23_
+_Last updated: 2026-10-21_
 
 Living status doc. The economic rationale lives in the **private** (gitignored)
 `ECONOMICS.md`; this file is the operational state.
@@ -22,13 +22,16 @@ switch on later.
   Old URL https://kherhim.github.io/brightspark-11plus/ auto-redirects.
 - **Backend (Cloudflare Worker):**
   https://brightspark-worker-production.brightspark.workers.dev
-- **Repo:** public (`kherhim/brightspark-11plus`); Pages serves `main`.
+- **Repo:** public (`kherhim/brightspark-11plus`). Pages is deployed by
+  GitHub Actions from the built `dist/` directory on each merge to `main`;
+  the repository root is no longer served.
 - **Domain registrar:** Cloudflare Registrar (apex `brightsparkprep.com`,
   www CNAME → apex). DNS managed at Cloudflare.
 
 ## Architecture
 
-- Zero-build static SPA (HTML/CSS/ES modules), local-first (localStorage,
+- Static SPA (HTML/CSS/ES modules; no build needed in development, a
+  bundling/minifying production build in `scripts/build-site.mjs`), local-first (localStorage,
   schema v4). Progress stays on the device; the Worker supplies public access
   configuration and optional parent authentication.
 - Minimal backend: Cloudflare Worker + D1 (SQLite) — passwordless
@@ -138,7 +141,8 @@ Still recommended:
   (`EMAIL_API_KEY` on env.production).
 - Commits: author `kherhim` (NOT the work email). Outward-facing actions
   (push, prod deploy) are confirmed before execution.
-- Tests: client `node tests/run-node.mjs`; Worker `cd worker && npm test`.
+- Tests: client `npm test` (logic, security, production build); Worker
+  `cd worker && npm test`. CI runs both on every pull request.
 - Domain DNS: Cloudflare (Registrar + DNS). GitHub Pages records (4 apex
   A + www CNAME) are **DNS only** (grey cloud), so GitHub provisions its
   own Let's Encrypt cert. Resend records (DKIM TXT at `resend._domainkey`,
@@ -166,3 +170,37 @@ publishes the frontend through GitHub Pages.
   test webhooks targeting production were disabled.
 
 See `worker/README.md` for deployment and verification commands.
+
+## October 2026 — controlled production build (items 7 and 8)
+
+- **7. Controlled publish:** GitHub Actions (`.github/workflows/pages.yml`)
+  runs the client and Worker tests, builds `dist/` with
+  `scripts/build-site.mjs` and deploys only that directory. The build has an
+  allowlist (four HTML pages, `CNAME`, `style.css`, `js/main.js`,
+  `data/*.json`) and fails if anything else appears. Docs, tests, the Worker,
+  `STATUS.md`, `package*.json` etc. are no longer publicly served. The staging
+  site uses the same build with only the API base swapped. `.nojekyll` is not
+  needed by an Actions deploy and is not published.
+- **8. Minification (measured, no lazy-loading):** esbuild (pinned 0.25.10)
+  bundles the 66 ES modules into one minified `js/main.js` (no dynamic
+  imports exist, so this is not code splitting) and minifies CSS and JSON.
+  HTML is left as written. First load of `app.html`:
+
+  | Asset | Before | After |
+  | --- | --- | --- |
+  | JavaScript | 66 requests · 350.2 KB · 120.6 KB gzip | 1 request · 205.8 KB · 62.9 KB gzip |
+  | CSS | 12.4 KB · 3.5 KB gzip | 9.2 KB · 2.6 KB gzip |
+  | Data (2 JSON) | 40.4 KB · 11.2 KB gzip | 35.5 KB · 11.0 KB gzip |
+
+  Total transfer roughly halves (135 → 77 KB gzip) and the 66-step module
+  waterfall becomes one request. At ~77 KB compressed, lazy-loading or code
+  splitting is not justified; revisit only if the bundle grows substantially.
+- Development is unchanged: serving the repo root still loads the source
+  modules directly with no build step.
+- Dependency audit fixes made alongside: `source-map-js` (via jsdom) and
+  Worker dev tooling (`wrangler`/`miniflare`/`undici`/`sharp`) — both audits
+  report zero known vulnerabilities; 430 client + 36 security/build + 64 Worker
+  tests pass.
+- Rollback (emergency): `gh api -X PUT repos/kherhim/brightspark-11plus/pages
+  -f build_type=legacy -f 'source[branch]=main' -f 'source[path]=/'` restores
+  root serving from `main`.

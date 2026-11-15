@@ -21,6 +21,19 @@ test('production build publishes only allowlisted public assets', async () => {
   assert.equal(readFileSync(join(prodDir, 'CNAME'), 'utf8').trim(), 'brightsparkprep.com');
 });
 
+test('published site opts out of AI training crawlers', () => {
+  const robots = readFileSync(join(prodDir, 'robots.txt'), 'utf8');
+  for (const bot of ['GPTBot', 'ClaudeBot', 'Google-Extended', 'CCBot', 'Applebot-Extended', 'Bytespider'])
+    assert.match(robots, new RegExp(`^User-agent: ${bot}$`, 'm'), `${bot} is listed`);
+  const aiGroup = robots.split(/\n\s*\n/).find(g => g.includes('User-agent: GPTBot'));
+  assert.match(aiGroup, /^Disallow: \/$/m, 'AI crawlers are disallowed site-wide');
+  assert.match(robots, /User-agent: \*\nAllow: \//, 'ordinary search engines stay allowed');
+  for (const page of ['index.html', 'app.html', 'privacy.html', 'terms.html']) {
+    const doc = new JSDOM(readFileSync(join(prodDir, page), 'utf8')).window.document;
+    assert.match(doc.querySelector('meta[name="robots"]')?.content || '', /\bnoai\b.*\bnoimageai\b/, `${page} has noai meta`);
+  }
+});
+
 test('bundle is valid, minified and points at production', () => {
   const bundle = readFileSync(join(prodDir, 'js/main.js'), 'utf8');
   execFileSync(process.execPath, ['--check', join(prodDir, 'js/main.js')]);

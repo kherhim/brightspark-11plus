@@ -11,7 +11,7 @@ import { gzipSync } from 'node:zlib';
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const PRODUCTION_API_BASE = 'https://brightspark-worker-production.brightspark.workers.dev';
 export const PAGES = ['index.html', 'app.html', 'privacy.html', 'terms.html'];
-const STATIC = ['CNAME'];
+const STATIC = ['CNAME', 'robots.txt'];
 
 // Every file the published site may contain. Anything else is a build error.
 export function expectedFiles(dataFiles = readdirSync(join(ROOT, 'data'))) {

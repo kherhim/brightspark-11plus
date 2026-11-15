@@ -45,26 +45,15 @@ export function makeEnv(overrides = {}) {
       get accounts() { return snapshot('accounts','email'); },
       get sessions() { return snapshot('sessions','session_id'); },
       get entitlements() { return snapshot('entitlements','account_id'); },
-      get events() { return new Set(snapshot('stripe_events','event_id').keys()); }, kv,
+      get events() { return new Set(snapshot('stripe_events','event_id').keys()); },
+      get fulfillments() { return sqlite.prepare('SELECT count(*) AS n FROM checkout_fulfillments').get().n; }, kv,
     },
     ENVIRONMENT: 'local',
     ALLOWED_ORIGIN: 'http://localhost:8000',
     MAGIC_LINK_BASE: 'http://localhost:8000/app.html',
     CONSENT_VERSION: '2026-05-22',
     EMAIL_PROVIDER: 'console', EMAIL_FROM: 'Audit <audit@example.invalid>',
-    PRICE_ONEOFF: 'price_one', PRICE_FAMILY: 'price_fam', PRICE_ANNUAL: 'price_ann',
-    ACCESS_DAYS_ONEOFF: '1095', ACCESS_DAYS_FAMILY: '1095', ACCESS_DAYS_ANNUAL: '365',
-    FAMILY_SEATS: '3', PAYMENTS_ENABLED: 'false', STRIPE_LIVE_MODE: 'false',
     AUTH_EMAIL_LIMIT: '5', AUTH_IP_LIMIT: '20', AUTH_DAILY_LIMIT: '1000',
-    STRIPE_WEBHOOK_SECRET: 'whsec_test', STRIPE_SECRET: 'sk_test_unused',
     ...overrides,
   };
-}
-
-export async function stripeSig(payload, secret) {
-  const enc = new TextEncoder();
-  const t = Math.floor(Date.now()/1000);
-  const key = await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
-  const mac = await crypto.subtle.sign('HMAC',key,enc.encode(`${t}.${payload}`));
-  return `t=${t},v1=${Buffer.from(mac).toString('hex')}`;
 }

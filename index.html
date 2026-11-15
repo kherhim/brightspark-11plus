@@ -33,7 +33,7 @@
     <nav>
       <a href="#how">How it works</a>
       <a href="#subjects">Subjects</a>
-      <a href="#pricing">Free access</a>
+      <a href="#free">Free access</a>
       <a href="#faq">FAQ</a>
       <a href="./app.html" class="lp-nav-cta" data-ev="start_free" data-from="nav">Open the app</a>
     </nav>
@@ -50,7 +50,7 @@
       </p>
       <div class="btn-row" style="justify-content:center">
         <a class="btn big" href="./app.html" data-ev="start_free" data-from="hero">▶ Start free — no account</a>
-        <a class="btn big secondary" href="#pricing" data-ev="see_pricing" data-from="hero">What you get</a>
+        <a class="btn big secondary" href="#free" data-ev="see_free" data-from="hero">What you get</a>
       </div>
       <p class="muted lp-fineprint">
         Free to use in your browser. No sign-up needed to practise. No
@@ -99,7 +99,7 @@
       </ul>
     </section>
 
-    <section id="pricing" class="card center">
+    <section id="free" class="card center">
       <h2>Free — the whole thing</h2>
       <p class="muted">
         All four subjects, timed mock exams, smart spaced review, readiness
@@ -107,24 +107,19 @@
         payment and no card details.
       </p>
       <p>
-        Brightspark Prep is new, and while we find our feet it is
-        <b>completely free for everyone</b>. There is nothing to buy and
-        nothing to cancel. Create a free account if you'd like your child's
+        Brightspark Prep is <b>completely free for everyone</b> and takes no
+        payments. There is nothing to buy and nothing to cancel. Create a free account if you'd like your child's
         progress to follow them across devices — that is optional, and the
         only reason to sign up.
       </p>
-      <p class="muted lp-fineprint">
-        We may introduce paid plans later as the app grows; if we do, we'll
-        give plenty of notice first.
-      </p>
       <div class="btn-row" style="justify-content:center">
-        <a class="btn big" href="./app.html" data-ev="start_free" data-from="pricing">▶ Start practising free</a>
+        <a class="btn big" href="./app.html" data-ev="start_free" data-from="free">▶ Start practising free</a>
       </div>
     </section>
 
     <section id="faq" class="card">
       <h2>Questions parents ask</h2>
-      <details><summary>Is it really free?</summary><p>Yes — completely. All four subjects, mock exams, smart review, analytics and worksheets are free to use right now, with no payment and no card details. Brightspark Prep is new and free for everyone while we grow; we may add paid plans later, with plenty of notice.</p></details>
+      <details><summary>Is it really free?</summary><p>Yes — completely. All four subjects, mock exams, smart review, analytics and worksheets are free to use right now, with no payment and no card details. There is nothing to buy: Brightspark Prep takes no payments.</p></details>
       <details><summary>Do I need to create an account?</summary><p>No. Your child can start practising straight away with nothing to sign up for. A free account is optional — it simply lets their progress follow them across devices.</p></details>
       <details><summary>How is this different from the big platforms?</summary><p>Same serious, exam-calibrated practice and adaptive difficulty — but free, with no lock-in, and questions that re-randomise so children can't just memorise answers.</p></details>
       <details><summary>Which exam boards does it cover?</summary><p>The readiness picture can be tuned to GL, CEM, ISEB or CSSE; the practice itself spans the broad 11+ syllabus across all four subjects.</p></details>
@@ -167,8 +162,7 @@
         var a = e.target.closest("[data-ev]");
         if (!a) return;
         track(a.getAttribute("data-ev"), {
-          from: a.getAttribute("data-from") || null,
-          plan: a.getAttribute("data-plan") || null
+          from: a.getAttribute("data-from") || null
         });
       });
     })();

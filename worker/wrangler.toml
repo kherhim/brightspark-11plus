@@ -1,4 +1,6 @@
-# Brightspark Prep monetisation Worker.
+# Brightspark Prep Worker (optional magic-link accounts). The service is
+# free and takes no payments; payment code is archived at git tag
+# payments-archive-2026-11.
 #
 # Database IDs are not secrets. Production retains its existing database;
 # local and unprovisioned staging use a zero UUID that cannot target it.
@@ -10,10 +12,9 @@ compatibility_date = "2025-01-01"
 workers_dev = true
 
 # Non-secret config (safe to commit). Secrets go via `wrangler secret put`:
-#   STRIPE_SECRET, STRIPE_WEBHOOK_SECRET, EMAIL_API_KEY
+#   EMAIL_API_KEY
 [vars]
 ENVIRONMENT = "local"
-STRIPE_LIVE_MODE = "false"
 AUTH_EMAIL_LIMIT = "5"
 AUTH_IP_LIMIT = "20"
 AUTH_DAILY_LIMIT = "1000"
@@ -22,22 +23,6 @@ MAGIC_LINK_BASE = "http://localhost:8000/app.html"  # where /auth/verify link po
 EMAIL_FROM = "Brightspark Prep <no-reply@example.com>"
 EMAIL_PROVIDER = "console"                       # "console" (dev) | "resend"
 CONSENT_VERSION = "2026-05-22"
-# Stripe Price ids (create them in the Stripe dashboard — test mode first):
-PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
-PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
-PRICE_ANNUAL = "price_1TYpI3IsGUHwvauqmkY1IJo9"
-# Access windows granted on successful payment (days):
-ACCESS_DAYS_ONEOFF = "1095"   # ~3 years — covers the 11+ window
-ACCESS_DAYS_FAMILY = "1095"
-ACCESS_DAYS_ANNUAL = "365"
-FAMILY_SEATS = "3"
-# Paid features stay OFF in prod until an explicit cutover:
-PAYMENTS_ENABLED = "false"
-# Free-for-all launch era: while "true", all premium subjects and features
-# are open to everyone — no account or payment. Ending the era means
-# flipping this AND FREE_ERA_DEFAULT in js/config.js (the monetisation
-# launch). The client fails open, so this can only ever turn access OFF.
-FREE_ERA = "true"
 
 [[d1_databases]]
 binding = "DB"
@@ -50,7 +35,6 @@ migrations_dir = "migrations"
 workers_dev = true
 [env.staging.vars]
 ENVIRONMENT = "staging"
-STRIPE_LIVE_MODE = "false"
 AUTH_EMAIL_LIMIT = "5"
 AUTH_IP_LIMIT = "20"
 AUTH_DAILY_LIMIT = "100"
@@ -60,29 +44,19 @@ MAGIC_LINK_BASE = "https://brightspark-staging-site.brightspark.workers.dev/app.
 EMAIL_PROVIDER = "resend"
 EMAIL_FROM = "Brightspark Prep <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-22"
-PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
-PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
-PRICE_ANNUAL = "price_1TYpI3IsGUHwvauqmkY1IJo9"
-ACCESS_DAYS_ONEOFF = "1095"
-ACCESS_DAYS_FAMILY = "1095"
-ACCESS_DAYS_ANNUAL = "365"
-FAMILY_SEATS = "3"
-PAYMENTS_ENABLED = "true"
-FREE_ERA = "true"
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "brightspark-staging"
 database_id = "f0b341e9-4a16-45da-bf1a-f51fe7387275"
 migrations_dir = "migrations"
 
-# --- Production: cloud on, PAYMENTS OFF until deliberate launch ---------
+# --- Production -------------------------------------------------------
 # workers_dev on: the public site (github.io) calls this cross-origin, so
 # we need a stable *.workers.dev URL until/unless a custom route is added.
 [env.production]
 workers_dev = true
 [env.production.vars]
 ENVIRONMENT = "production"
-STRIPE_LIVE_MODE = "true"
 AUTH_EMAIL_LIMIT = "5"
 AUTH_IP_LIMIT = "20"
 AUTH_DAILY_LIMIT = "1000"
@@ -93,19 +67,6 @@ MAGIC_LINK_BASE = "https://brightsparkprep.com/app.html"
 EMAIL_PROVIDER = "resend"
 EMAIL_FROM = "Brightspark Prep <no-reply@brightsparkprep.com>"
 CONSENT_VERSION = "2026-05-22"
-PRICE_ONEOFF = "price_1TYpI4IsGUHwvauqVmOa14MI"
-PRICE_FAMILY = "price_1TYpI4IsGUHwvauq970T8q77"
-PRICE_ANNUAL = "price_1TYpI3IsGUHwvauqmkY1IJo9"
-ACCESS_DAYS_ONEOFF = "1095"
-ACCESS_DAYS_FAMILY = "1095"
-ACCESS_DAYS_ANNUAL = "365"
-FAMILY_SEATS = "3"
-# Stays "false" until C6 real launch (privacy/terms + Resend email + the
-# test→live Stripe key swap). Flipping this to "true" with LIVE keys is
-# the deliberate revenue switch. (C5 end-to-end test passed 2026-05-19.)
-PAYMENTS_ENABLED = "false"
-# Free-for-all launch era ON: every subject + feature open to all users.
-FREE_ERA = "true"
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "brightspark"

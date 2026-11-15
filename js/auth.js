@@ -1,6 +1,6 @@
 // Passwordless magic-link auth client. Every call degrades gracefully:
 // with no backend (or offline) it resolves to "not authenticated" and the
-// app stays in free mode — it never throws into the UI.
+// app works without an account — it never throws into the UI.
 
 import { hasBackend, apiUrl } from "./config.js";
 
@@ -63,8 +63,8 @@ export async function verifyToken(token) {
   return { ok: false };
 }
 
-// Who am I + entitlement. Returns a safe "free" shape when no session /
-// no backend / offline.
+// Who am I. Returns a safe signed-out shape when no session / no backend /
+// offline.
 export async function me() {
   const FREE = { authenticated: false, paid: false };
   if (!hasBackend() || !getSession()) return FREE;
@@ -86,15 +86,4 @@ export async function me() {
 export async function logout() {
   await post("/logout", {}, true);
   setSession(null);
-}
-
-// Start Stripe Checkout for a plan; returns a redirect URL or a reason.
-export async function startCheckout(plan) {
-  const res = await post("/checkout", { plan }, true);
-  if (res.ok && res.data && res.data.url)
-    return { ok: true, url: res.data.url };
-  if (res.status === 403 && res.data && res.data.disabled)
-    return { ok: false, disabled: true };
-  if (res.status === 401) return { ok: false, unauthorized: true };
-  return { ok: false };
 }

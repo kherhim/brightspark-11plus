@@ -162,7 +162,8 @@ Plain HTML + CSS + ES modules, no framework:
 ```
 index.html (landing) · app.html (the SPA) · style.css · .nojekyll
 js/  rng · format · store · topics · engine · questionFactory · curated ·
-     review · fixits · analytics · boards · engagement · entitlement ·
+     review · fixits · analytics · boards · engagement · entitlement
+     (signed-in account cache) · auth · config ·
      answers · print · main
 js/persistence/  adapter · localAdapter   (one async surface; cloud-sync ready)
 js/generators/  _shared + _words + _svg + 30 topic modules + index
@@ -195,6 +196,15 @@ adds optional cross-device sync with **no screen changes**.
   local-first, with no breaking change to saved progress.
 - **Phase 5+ — cloud (planned, opt-in)**: an optional accounts + magic-link
   backend so progress can sync across devices, then privacy-safe cohort
-  **benchmarking** and a flag-gated paid AI essay-marking add-on. These
-  introduce a backend and are a deliberate separate effort; the free
-  local-first app keeps working untouched until any cutover.
+  **benchmarking** and AI essay marking. These introduce a backend and are
+  a deliberate separate effort; the free local-first app keeps working
+  untouched until any cutover.
+
+## Payments
+
+Brightspark Prep is free and takes no payments. All payment functionality
+(Stripe Checkout and webhook routes in the Worker, client checkout, paywall
+and pricing UI) was removed in November 2026, so nothing in the site or
+backend can take money or lock content. The removed code is archived at git
+tag `payments-archive-2026-11`. The Worker's D1 payment tables are retained
+with their data; see `worker/README.md`.

@@ -8,9 +8,9 @@
 //   #/review            spaced review of past mistakes + fix-it
 //   #/worksheet         printable worksheet generator (+ answer key)
 //   #/parent            parent dashboard
-//   #/signup[/<plan>]   passwordless sign-in (optional intended plan)
+//   #/signup            passwordless sign-in
 //   #/verify/<token>    magic-link landing (exchanges token for a session)
-//   #/account[/<flag>]  account + upgrade (flag: paid | cancelled)
+//   #/account           signed-in account (email, sign out)
 
 export function parseHash() {
   const raw = (location.hash || "#/home").replace(/^#\/?/, "");

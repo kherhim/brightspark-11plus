@@ -71,16 +71,10 @@
         <li><b>Sign-in session identifiers</b> — random opaque tokens so you
           stay signed in across devices. <i>Lawful basis: contract / security
           legitimate interests.</i></li>
-        <li><b>Any purchase and entitlement</b> — if you make a payment: which
-          plan, status, expiry, and a Stripe customer reference. Payments are
-          <b>not currently enabled</b> — Brightspark Prep is free during our
-          launch — so this applies only if and when paid plans are introduced.
-          <i>Lawful basis: contract; and legal obligation for tax/accounting
-          records.</i></li>
       </ul>
       <p>
-        We <b>never receive or store card or payment details</b>. Payments are
-        handled entirely by Stripe (see processors below). Sign-in "magic link"
+        Brightspark Prep is free and <b>takes no payments</b>, so we never
+        ask for or receive card or payment details. Sign-in "magic link"
         tokens are stored only as a hashed value, are single-use, and expire
         within about 15 minutes.
       </p>
@@ -98,7 +92,7 @@
         We use <b>no advertising or cross-site tracking cookies</b>. After you
         sign in, your session token is kept in your browser's local storage
         (not a cookie). Our usage analytics are <b>cookieless and aggregate</b>
-        — anonymous event counts (e.g. "pricing viewed") with no personal data
+        — anonymous event counts (e.g. "app opened") with no personal data
         and no individual tracking; if a privacy-focused analytics provider
         (such as Plausible) is enabled it remains cookieless and aggregate.
       </p>
@@ -108,8 +102,7 @@
       <h2>4. Who processes data for us</h2>
       <ul>
         <li><b>GitHub Pages</b> — static website hosting (page delivery, server logs).</li>
-        <li><b>Cloudflare</b> — the accounts/entitlement backend (Workers, D1 database, KV) and content delivery.</li>
-        <li><b>Stripe</b> — payment processing and tax (Stripe Tax), used only if and when paid plans are introduced. Stripe is an independent controller for payment data under its own privacy policy.</li>
+        <li><b>Cloudflare</b> — the accounts backend (Workers, D1 database, KV) and content delivery.</li>
         <li><b>Resend</b> (Resend.com Inc.) — sending sign-in/magic-link emails.</li>
       </ul>
       <p class="muted">
@@ -125,7 +118,7 @@
         <li><b>Local device data (no account):</b> until you clear your browser — we never hold it.</li>
         <li><b>Magic-link tokens:</b> minutes (single-use, ~15-minute expiry).</li>
         <li><b>Sign-in sessions:</b> until they expire or you sign out.</li>
-        <li><b>Account &amp; entitlement:</b> while your account exists; any purchase/transaction records are retained for as long as required by UK tax and accounting law (generally up to 6 years).</li>
+        <li><b>Account:</b> while your account exists, except records we must keep to meet legal obligations.</li>
       </ul>
     </section>
 
@@ -137,7 +130,7 @@
         portability, and to withdraw consent at any time. To exercise any of
         these, email <b>himanshu.kher@gmail.com</b>. We will delete your
         account and associated server-side data on request, except records we
-        must keep to meet legal obligations (e.g. tax records of a purchase).
+        must keep to meet legal obligations.
       </p>
       <p>
         You can also complain to the UK Information Commissioner's Office (ICO)

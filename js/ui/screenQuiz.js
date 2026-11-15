@@ -1,11 +1,5 @@
-import { escapeHTML, h, button, levelDots, clear, paywallCard } from "./components.js";
-import { TOPICS, topicById } from "../topics.js";
-import {
-  fullAccess,
-  subjectAllowed,
-  freeTopicIds,
-  dailyCapReached,
-} from "../entitlement.js";
+import { escapeHTML, h, button, levelDots, clear } from "./components.js";
+import { topicById } from "../topics.js";
 import { ensureTopic } from "../store.js";
 import { selectTopic, presentationLevel, recordResult } from "../engine.js";
 import { getQuestion } from "../questionFactory.js";
@@ -47,41 +41,16 @@ export function renderQuiz(ctx, params) {
   const { state, mount } = ctx;
   const practiceTopic = params && params[0] ? params[0] : null;
 
-  if (practiceTopic) {
-    const ptSubject = (topicById(practiceTopic) || {}).subject;
-    if (!subjectAllowed(ptSubject)) {
-      clear(mount);
-      mount.appendChild(
-        paywallCard(
-          "This subject is premium",
-          "Maths is free to practise. Verbal & Non-Verbal Reasoning and English are part of full access."
-        )
-      );
-      return;
-    }
-  }
-
   let sessionCount = 0;
   let sessionCorrect = 0;
   let current = null; // { question, topicId, level, startedAt, graded }
 
   function pickTopic() {
     if (practiceTopic) return practiceTopic;
-    const pool = fullAccess() ? null : freeTopicIds(TOPICS);
-    return selectTopic(state, makeRng(freshSeed()), Date.now(), pool);
+    return selectTopic(state, makeRng(freshSeed()), Date.now());
   }
 
   function nextQuestion(opts = {}) {
-    if (dailyCapReached(state)) {
-      clear(mount);
-      mount.appendChild(
-        paywallCard(
-          "That's today's free questions",
-          "Free practice is capped each day. Full access removes the cap and unlocks all four subjects, mocks, smart review, analytics and worksheets."
-        )
-      );
-      return;
-    }
     const topicId = opts.topicId || pickTopic();
     const level =
       opts.level != null ? opts.level : presentationLevel(state, topicId);

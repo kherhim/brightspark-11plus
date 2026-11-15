@@ -16,7 +16,7 @@ function setup() {
   globalThis.document = dom.window.document;
   globalThis.sessionStorage = dom.window.sessionStorage;
   setSession(null);
-  setServerConfig({ freeEra: true, consentVersion: '1' });
+  setServerConfig({ consentVersion: '1' });
   return { mount: document.querySelector('main'), state: freshState(), navigate() {}, save() {} };
 }
 const settle = () => new Promise(resolve => setTimeout(resolve, 50));
@@ -42,31 +42,29 @@ test('consent version remains text while legal links work', () => {
   inert(ctx.mount, payload);
   assert.equal(ctx.mount.querySelector('a').getAttribute('href'), './terms.html');
 });
-test('account email and plan are plain text', async () => {
+test('account email is plain text', async () => {
   const ctx = setup();
   setSession('test-session');
   globalThis.fetch = async () => Response.json({ authenticated: true, paid: true, email: payload, plan: payload, valid_until: null });
   renderAccount(ctx, []);
   await settle();
   inert(ctx.mount, payload);
-  assert.equal(ctx.mount.textContent.split(payload).length - 1, 2);
+  assert.equal(ctx.mount.textContent.split(payload).length - 1, 1, 'only the email is shown; plan data is ignored');
 });
-test('paid URL flag cannot claim payment until server confirms entitlement', async () => {
-  const ctx = setup();
-  setSession('test-session');
-  globalThis.fetch = async () => Response.json({ authenticated: true, paid: false, email: 'parent@example.com' });
-  renderAccount(ctx, ['paid']);
-  await settle();
-  assert.doesNotMatch(ctx.mount.textContent, /Payment received|You're all set/);
-  assert.match(ctx.mount.textContent, /confirm/i);
-});
-test('confirmed paid account still shows payment success', async () => {
-  const ctx = setup();
-  setSession('test-session');
-  globalThis.fetch = async () => Response.json({ authenticated: true, paid: true, email: 'parent@example.com' });
-  renderAccount(ctx, ['paid']);
-  await settle();
-  assert.match(ctx.mount.textContent, /Payment received/);
+test('account screen offers nothing to buy, whatever the server reports', async () => {
+  for (const flag of [[], ['paid'], ['cancelled']]) {
+    const ctx = setup();
+    setSession('test-session');
+    setServerConfig({ freeEra: false, paymentsEnabled: true, consentVersion: '1' });
+    globalThis.fetch = async () => Response.json({ authenticated: true, paid: false, email: 'parent@example.com' });
+    renderAccount(ctx, flag);
+    await settle();
+    const text = ctx.mount.textContent;
+    assert.doesNotMatch(text, /£|checkout|payment received|upgrade|see plans/i);
+    assert.match(text, /free/i);
+    const labels = [...ctx.mount.querySelectorAll('button, a')].map(b => b.textContent.trim());
+    assert.deepEqual(labels, ['Sign out', 'Back to practice']);
+  }
 });
 test('review renders imported child name as text', () => {
   const ctx = setup();

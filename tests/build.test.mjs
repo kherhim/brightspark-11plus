@@ -29,6 +29,12 @@ test('bundle is valid, minified and points at production', () => {
   assert.ok(bundle.split('\n').length < 20, 'bundle is minified');
 });
 
+test('bundle contains no payment or paywall code', () => {
+  const bundle = readFileSync(join(prodDir, 'js/main.js'), 'utf8');
+  for (const token of ['/checkout', 'stripe', 'Stripe', 'See plans', 'paymentsEnabled', 'startCheckout', 'index.html#pricing'])
+    assert.ok(!bundle.includes(token), `bundle must not contain ${token}`);
+});
+
 test('data files keep identical content after minification', () => {
   for (const file of ['curated.json', 'fixits.json'])
     assert.deepEqual(JSON.parse(readFileSync(join(prodDir, 'data', file), 'utf8')), JSON.parse(readFileSync(join(ROOT, 'data', file), 'utf8')));
@@ -58,7 +64,7 @@ test('built app boots and renders every screen', async () => {
   globalThis.fetch = async url => {
     const path = new URL(String(url), 'https://brightsparkprep.com/').pathname;
     if (path.startsWith('/data/')) return new Response(readFileSync(join(prodDir, path)), { headers: { 'content-type': 'application/json' } });
-    if (path === '/config') return Response.json({ freeEra: true, paymentsEnabled: false, consentVersion: '1' });
+    if (path === '/config') return Response.json({ cloud: true, freeEra: true, consentVersion: '1' });
     return new Response('{}', { status: 401 });
   };
   const settle = () => new Promise(resolve => setTimeout(resolve, 50));
@@ -71,6 +77,7 @@ test('built app boots and renders every screen', async () => {
       const text = document.getElementById('app').textContent;
       assert.ok(text.trim().length > 0 && !text.startsWith('Loading'), `${screen} rendered`);
       assert.doesNotMatch(text, /Something went wrong/, `${screen} has no render error`);
+      assert.doesNotMatch(text, /\u{1F512}|premium|See plans/iu, `${screen} is not locked`);
     }
     for (const quiz of ['#/quiz', '#/quiz/place-value']) {
       window.location.hash = quiz;

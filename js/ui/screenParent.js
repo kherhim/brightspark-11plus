@@ -6,10 +6,8 @@ import {
   progressBar,
   subjectPill,
   engagementWidget,
-  paywallCard,
   clear,
 } from "./components.js";
-import { featureAllowed } from "../entitlement.js";
 import {
   TOPICS, topicById, activeSubjects, topicsBySubject,
 } from "../topics.js";
@@ -184,14 +182,8 @@ export function renderParent(ctx) {
       ]),
       rTable,
     ]);
-  mount.appendChild(
-    featureAllowed("analytics")
-      ? readinessCard
-      : paywallCard(
-          "Readiness analytics are premium",
-          "The per-subject readiness band, pace flags and the plain-English explanations are part of full access. Progress, error patterns and your data controls below stay free."
-        )
-  );
+  mount.appendChild(readinessCard);
+
 
   // Per-topic table
   const table = h("table", { class: "dash" });

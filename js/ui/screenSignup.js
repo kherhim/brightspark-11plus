@@ -2,20 +2,10 @@ import { escapeHTML, h, button, clear } from "./components.js";
 import { hasBackend, serverConfig } from "../config.js";
 import { isSignedIn, requestLink } from "../auth.js";
 
-// Parent email → passwordless magic link. Optional plan (params[0]) is
-// remembered so checkout can continue right after sign-in.
-export function renderSignup(ctx, params) {
+// Parent email → passwordless magic link.
+export function renderSignup(ctx) {
   const { mount } = ctx;
   clear(mount);
-
-  const plan = params && params[0] ? params[0] : null;
-  if (plan) {
-    try {
-      sessionStorage.setItem("bs.pendingPlan", plan);
-    } catch (e) {
-      /* ignore */
-    }
-  }
 
   if (isSignedIn()) {
     ctx.navigate("account");

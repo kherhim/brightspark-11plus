@@ -44,9 +44,9 @@ export function validateRemoteConfig(config, environment) {
   const vars = selected.vars ?? {};
   requireSafe(vars.ENVIRONMENT === environment, 'ENVIRONMENT must match the selected environment.');
   requireSafe(vars.EMAIL_PROVIDER === 'resend', 'Remote environments must send email through Resend, never console logs.');
-  requireSafe(vars.STRIPE_LIVE_MODE === (environment === 'production' ? 'true' : 'false'),
-    'STRIPE_LIVE_MODE must be true only in production.');
-  requireSafe(['true', 'false'].includes(vars.PAYMENTS_ENABLED), 'Set PAYMENTS_ENABLED explicitly.');
+  // The service takes no payments (archived at tag payments-archive-2026-11).
+  const paymentVars = Object.keys(vars).filter(key => /^(STRIPE_|PRICE_|PAYMENTS_)/.test(key));
+  requireSafe(!paymentVars.length, `Remove payment configuration: ${paymentVars.join(', ')}.`);
   for (const key of ['AUTH_EMAIL_LIMIT', 'AUTH_IP_LIMIT', 'AUTH_DAILY_LIMIT']) {
     requireSafe(/^[1-9]\d*$/.test(vars[key]) && Number.isSafeInteger(Number(vars[key])),
       `${key} must be an explicit positive integer.`);

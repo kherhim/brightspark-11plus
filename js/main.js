@@ -16,7 +16,7 @@ import { renderSignup } from "./ui/screenSignup.js";
 import { renderVerify } from "./ui/screenVerify.js";
 import { renderAccount } from "./ui/screenAccount.js";
 import { loadServerConfig } from "./config.js";
-import { refreshEntitlement } from "./entitlement.js";
+import { refreshAccount } from "./entitlement.js";
 
 const mount = document.getElementById("app");
 const noticeEl = document.getElementById("notice");
@@ -87,13 +87,12 @@ async function boot() {
       "Heads up: this browser won't save progress (private mode or storage blocked). You can still practise, and export progress from the Parent page."
     );
   }
-  // Monetisation boot: both are safe no-ops with no backend / offline, so
-  // the free app is unaffected until config.API_BASE is set (Stage C).
+  // Optional-accounts boot: both are safe no-ops with no backend / offline.
   try {
     await loadServerConfig();
-    await refreshEntitlement();
+    await refreshAccount();
   } catch (e) {
-    /* stay in free mode */
+    /* carry on without an account */
   }
   startRouter(route);
 }

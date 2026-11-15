@@ -1,18 +1,13 @@
 import { escapeHTML, h, button, clear } from "./components.js";
-import { hasBackend, paymentsEnabled, freeEra } from "../config.js";
-import { isSignedIn, logout, startCheckout } from "../auth.js";
-import { refreshEntitlement, account, isPaid } from "../entitlement.js";
+import { hasBackend } from "../config.js";
+import { isSignedIn, logout } from "../auth.js";
+import { refreshAccount, account } from "../entitlement.js";
 
-const PLANS = [
-  { id: "oneoff", label: "11+ Access", price: "£34 one-off" },
-  { id: "family", label: "Family (up to 3 children)", price: "£49 one-off" },
-  { id: "annual", label: "Annual", price: "£29 (12 months)" },
-];
-
-export function renderAccount(ctx, params) {
+// Brightspark Prep is free and takes no payments, so the account screen
+// only shows who is signed in. Everything is open to everyone.
+export function renderAccount(ctx) {
   const { mount } = ctx;
   clear(mount);
-  const flag = params && params[0] ? params[0] : null; // "paid" | "cancelled"
 
   if (!hasBackend()) {
     mount.appendChild(
@@ -32,7 +27,7 @@ export function renderAccount(ctx, params) {
     mount.appendChild(
       h("div", { class: "card center" }, [
         h("h1", { text: "Your account" }),
-        h("p", { class: "muted", text: "Sign in to manage your access." }),
+        h("p", { class: "muted", text: "Sign in to keep your child's progress in sync across your devices." }),
         button("Sign in", () => ctx.navigate("signup"), "btn big"),
       ])
     );
@@ -44,95 +39,18 @@ export function renderAccount(ctx, params) {
   );
 
   (async () => {
-    await refreshEntitlement();
+    await refreshAccount();
     clear(mount);
     const acc = account();
-
-    if (flag === "paid" && isPaid()) {
-      mount.appendChild(
-        h("div", { class: "card center" }, [
-          h("h1", { text: "You're all set 🎉" }),
-          h("p", { class: "muted", text: "Payment received — full access is unlocked. Thank you for supporting an indie tool!" }),
-        ])
-      );
-    } else if (flag === "paid") {
-      mount.appendChild(h("div", { class: "card" }, [
-        h("p", { class: "muted", text: "Your payment has not been confirmed yet. Please refresh your account shortly to check your access." }),
-      ]));
-    } else if (flag === "cancelled") {
-      mount.appendChild(
-        h("div", { class: "card" }, [
-          h("p", { class: "muted", text: "Checkout cancelled — no payment was taken." }),
-        ])
-      );
-    }
 
     const rows = [
       h("h1", { text: "Your account" }),
       h("p", { html: `Signed in as <b>${escapeHTML((acc && acc.email) || "—")}</b>.` }),
+      h("p", {
+        class: "muted",
+        text: "Brightspark Prep is free for everyone — every subject, mock exams, smart review, analytics and worksheets, with nothing to pay. Your account keeps your progress in sync across every device you sign in on.",
+      }),
     ];
-
-    if (isPaid()) {
-      const until = acc && acc.valid_until
-        ? new Date(acc.valid_until).toLocaleDateString("en-GB")
-        : null;
-      rows.push(
-        h("p", {
-          html: `Plan: <b>full access</b>${
-            acc && acc.plan ? ` (${escapeHTML(acc.plan)})` : ""
-          }${until ? ` — valid until <b>${until}</b>` : ""}.`,
-        }),
-        h("p", { class: "muted", text: "All four subjects, mocks, smart review, analytics and worksheets are unlocked on this and any device you sign in on." })
-      );
-    } else if (freeEra()) {
-      rows.push(
-        h("p", {
-          html: "Plan: <b>full access</b> — free for everyone while Brightspark Prep is new.",
-        }),
-        h("p", {
-          class: "muted",
-          text: "All four subjects, mock exams, smart review, analytics and worksheets are unlocked — no payment needed. Your account keeps your progress in sync across every device you sign in on.",
-        })
-      );
-    } else if (paymentsEnabled()) {
-      let pending = null;
-      try {
-        pending = sessionStorage.getItem("bs.pendingPlan");
-        sessionStorage.removeItem("bs.pendingPlan");
-      } catch (e) {
-        /* ignore */
-      }
-      rows.push(
-        h("p", { class: "muted", text: "Unlock everything with one payment — no subscription." })
-      );
-      const ordered = pending
-        ? PLANS.slice().sort((a) => (a.id === pending ? -1 : 0))
-        : PLANS;
-      const note = h("p", { class: "muted" });
-      for (const p of ordered) {
-        rows.push(
-          h("div", { class: "btn-row" }, [
-            button(
-              `${p.label} — ${p.price}`,
-              async () => {
-                note.textContent = "Opening secure checkout…";
-                const r = await startCheckout(p.id);
-                if (r.ok && r.url) window.location.href = r.url;
-                else if (r.disabled) note.textContent = "Payments aren't live yet — please check back soon.";
-                else if (r.unauthorized) ctx.navigate("signup");
-                else note.textContent = "Couldn't start checkout. Please try again.";
-              },
-              "btn" + (pending && p.id === pending ? " big" : " secondary")
-            ),
-          ])
-        );
-      }
-      rows.push(note);
-    } else {
-      rows.push(
-        h("p", { class: "muted", text: "Payments aren't live yet — you'll be able to upgrade here soon. Maths practice stays free meanwhile." })
-      );
-    }
 
     rows.push(
       h("div", { class: "btn-row" }, [
@@ -140,7 +58,7 @@ export function renderAccount(ctx, params) {
           "Sign out",
           async () => {
             await logout();
-            await refreshEntitlement();
+            await refreshAccount();
             ctx.navigate("home");
             ctx.rerender();
           },

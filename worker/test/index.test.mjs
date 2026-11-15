@@ -1,13 +1,11 @@
 // Integration test for the Worker request router — drives src/index.js
-// end to end with real in-memory SQLite behind the D1 API (no Cloudflare/Stripe
-// network). Exercises the full magic-link → session → entitlement →
-// Stripe-webhook flow plus the security edges.
+// end to end with real in-memory SQLite behind the D1 API (no Cloudflare or
+// email network). Exercises the full magic-link → session → /me → logout flow,
+// the security edges, and that the removed payment routes stay gone.
 
 import test from "node:test";
 import assert from "node:assert/strict";
 import worker from "../src/index.js";
-
-const enc = new TextEncoder();
 
 import { makeEnv } from "./helpers/env.mjs";
 
@@ -18,44 +16,27 @@ const req = (path, opts = {}) =>
     ...opts,
   });
 
-async function stripeSig(payload, secret) {
-  const t = Math.floor(Date.now() / 1000);
-  const key = await crypto.subtle.importKey(
-    "raw",
-    enc.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const mac = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    enc.encode(`${t}.${payload}`)
-  );
-  const hex = [...new Uint8Array(mac)]
-    .map((x) => x.toString(16).padStart(2, "0"))
-    .join("");
-  return `t=${t},v1=${hex}`;
-}
-
 test("GET /health", async () => {
   const r = await worker.fetch(req("/health"), makeEnv());
   assert.equal(r.status, 200);
   assert.deepEqual(await r.json(), { ok: true });
 });
 
-test("GET /config: secret-free, payments off", async () => {
+test("GET /config: secret-free, no payment fields", async () => {
   const r = await worker.fetch(req("/config"), makeEnv());
   const j = await r.json();
+  assert.deepEqual(Object.keys(j).sort(), ["cloud", "consentVersion", "freeEra"]);
   assert.equal(j.cloud, true);
-  assert.equal(j.paymentsEnabled, false);
-  assert.equal(j.freeEra, false);
-  assert.equal(JSON.stringify(j).includes("whsec"), false);
+  assert.equal(j.consentVersion, "2026-05-22");
+  assert.equal("paymentsEnabled" in j, false);
+  assert.equal("plans" in j, false);
 });
 
-test("GET /config: FREE_ERA flag mirrors env", async () => {
-  const r = await worker.fetch(req("/config"), makeEnv({ FREE_ERA: "true" }));
-  assert.equal((await r.json()).freeEra, true);
+test("GET /config: freeEra is always true, even with legacy env vars", async () => {
+  const env = makeEnv({ FREE_ERA: "false", PAYMENTS_ENABLED: "true" });
+  const j = await (await worker.fetch(req("/config"), env)).json();
+  assert.equal(j.freeEra, true);
+  assert.equal("paymentsEnabled" in j, false);
 });
 
 test("CORS: preflight allowed vs blocked", async () => {
@@ -84,19 +65,13 @@ test("GET /me without session → 401 free shape", async () => {
   assert.deepEqual(await r.json(), { authenticated: false, paid: false });
 });
 
-test("webhook with bad signature → 400", async () => {
-  const r = await worker.fetch(
-    req("/stripe/webhook", {
-      method: "POST",
-      headers: { "Stripe-Signature": "t=1,v1=bad" },
-      body: JSON.stringify({ id: "evt_x", type: "x" }),
-    }),
-    makeEnv()
-  );
-  assert.equal(r.status, 400);
+test("unknown paths return 404", async () => {
+  const r = await worker.fetch(req("/nope"), makeEnv());
+  assert.equal(r.status, 404);
+  assert.deepEqual(await r.json(), { error: "not_found" });
 });
 
-test("full flow: magic-link → session → /me → webhook → paid (idempotent)", async () => {
+test("full flow: magic-link → session → /me → payment routes 404 → logout", async () => {
   const env = makeEnv();
   const logs = [];
   const orig = console.log;
@@ -157,7 +132,7 @@ test("full flow: magic-link → session → /me → webhook → paid (idempotent
   assert.equal(j.authenticated, true);
   assert.equal(j.paid, false);
 
-  // 5. checkout disabled while PAYMENTS_ENABLED=false
+  // 5. payment routes are gone, even for a signed-in, allowed-origin caller
   r = await worker.fetch(
     req("/checkout", {
       method: "POST",
@@ -166,56 +141,20 @@ test("full flow: magic-link → session → /me → webhook → paid (idempotent
     }),
     env
   );
-  assert.equal(r.status, 403);
-  assert.equal((await r.json()).disabled, true);
-
-  // 6. Stripe webhook grants entitlement (server→server: no Origin)
-  const payload = JSON.stringify({
-    id: "evt_1",
-    type: "checkout.session.completed",
-    livemode: false,
-    data: {
-      object: {
-        id: "cs_1", mode: "payment", payment_status: "paid", livemode: false,
-        client_reference_id: accountId,
-        customer: "cus_1",
-        metadata: { account_id: accountId, plan: "oneoff" },
-      },
-    },
-  });
-  const sig = await stripeSig(payload, env.STRIPE_WEBHOOK_SECRET);
+  assert.equal(r.status, 404);
   r = await worker.fetch(
-    new Request("https://api.test/stripe/webhook", {
+    req("/stripe/webhook", {
       method: "POST",
-      headers: { "Stripe-Signature": sig },
-      body: payload,
+      headers: { "Stripe-Signature": "t=1,v1=x" },
+      body: JSON.stringify({ id: "evt_1", type: "checkout.session.completed" }),
     }),
     env
   );
-  assert.equal(r.status, 200);
-  const ent = env._state.entitlements.get(accountId);
-  assert.equal(ent.status, "active");
-  assert.equal(ent.plan, "oneoff");
-  assert.ok(ent.valid_until > Date.now());
-
-  // 7. /me now paid — cross-device by construction (any session on this
-  //    account would see it; entitlement is account-keyed, not device).
+  assert.equal(r.status, 404);
   r = await worker.fetch(req("/me", { headers: auth }), env);
-  j = await r.json();
-  assert.equal(j.paid, true);
-  assert.equal(j.plan, "oneoff");
-
-  // 8. idempotent replay — same event id processed once
-  r = await worker.fetch(
-    new Request("https://api.test/stripe/webhook", {
-      method: "POST",
-      headers: { "Stripe-Signature": sig },
-      body: payload,
-    }),
-    env
-  );
-  assert.equal(r.status, 200);
-  assert.equal(env._state.events.size, 1, "event recorded once");
+  assert.equal((await r.json()).paid, false, "still not paid");
+  assert.equal(env._state.entitlements.get(accountId).status, "none");
+  assert.equal(env._state.events.size, 0, "no payment events recorded");
 
   // 9. logout invalidates the session
   r = await worker.fetch(

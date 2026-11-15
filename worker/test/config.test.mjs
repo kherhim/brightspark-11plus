@@ -8,8 +8,7 @@ function config() {
     vars: {
       ENVIRONMENT: name, EMAIL_PROVIDER: 'resend',
       ALLOWED_ORIGIN: `https://${host}`, MAGIC_LINK_BASE: `https://${host}/app.html`,
-      STRIPE_LIVE_MODE: name === 'production' ? 'true' : 'false',
-      PAYMENTS_ENABLED: 'false', AUTH_EMAIL_LIMIT: '5', AUTH_IP_LIMIT: '20', AUTH_DAILY_LIMIT: '100',
+      AUTH_EMAIL_LIMIT: '5', AUTH_IP_LIMIT: '20', AUTH_DAILY_LIMIT: '100',
     },
     d1_databases: [{ binding: 'DB', database_name: `brightspark-${name}`, database_id: id }],
   });
@@ -39,8 +38,9 @@ const unsafe = [
   ['missing environment', c => { delete c.env.staging.vars.ENVIRONMENT; }],
   ['wrong environment', c => { c.env.staging.vars.ENVIRONMENT = 'production'; }],
   ['console email', c => { c.env.staging.vars.EMAIL_PROVIDER = 'console'; }],
-  ['live staging Stripe', c => { c.env.staging.vars.STRIPE_LIVE_MODE = 'true'; }],
-  ['invalid payment flag', c => { c.env.staging.vars.PAYMENTS_ENABLED = 'yes'; }],
+  ['payment flag', c => { c.env.staging.vars.PAYMENTS_ENABLED = 'false'; }],
+  ['Stripe mode', c => { c.env.staging.vars.STRIPE_LIVE_MODE = 'false'; }],
+  ['price id', c => { c.env.staging.vars.PRICE_ONEOFF = 'price_x'; }],
   ['missing auth limit', c => { delete c.env.staging.vars.AUTH_EMAIL_LIMIT; }],
   ['unbounded auth limit', c => { c.env.staging.vars.AUTH_DAILY_LIMIT = '0'; }],
   ['staging production origin', c => { c.env.staging.vars.ALLOWED_ORIGIN = 'https://brightsparkprep.com'; }],
@@ -64,8 +64,8 @@ for (const [name, mutate] of unsafe) {
   });
 }
 
-test('production rejects test Stripe and console email', () => {
-  for (const [key, value] of [['STRIPE_LIVE_MODE', 'false'], ['EMAIL_PROVIDER', 'console']]) {
+test('production rejects console email and payment configuration', () => {
+  for (const [key, value] of [['EMAIL_PROVIDER', 'console'], ['STRIPE_LIVE_MODE', 'true'], ['PAYMENTS_ENABLED', 'true']]) {
     const candidate = config();
     candidate.env.production.vars[key] = value;
     assert.throws(() => validateRemoteConfig(candidate, 'production'));

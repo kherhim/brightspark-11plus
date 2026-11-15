@@ -1,6 +1,6 @@
 # Brightspark Prep — Project Status
 
-_Last updated: 2026-10-21_
+_Last updated: 2026-11-15_
 
 Living status doc. The economic rationale lives in the **private** (gitignored)
 `ECONOMICS.md`; this file is the operational state.
@@ -8,12 +8,11 @@ Living status doc. The economic rationale lives in the **private** (gitignored)
 ## What it is
 
 Local-first UK 11+ practice web app (Maths · Verbal Reasoning · Non-Verbal
-Reasoning · English). **Currently free for everyone** — every subject and
-feature, no account and no payment — for the launch period (operator's plan:
-free for at least the first 100 days, then monetise). Optional free accounts
-provide passwordless sign-in; learning progress remains browser-local. The monetisation path (one-off paid access; ~£20k/month
-profit goal — see `ECONOMICS.md`) is fully built and **dormant**, ready to
-switch on later.
+Reasoning · English). **Free for everyone** — every subject and feature, no
+account and no payment. Optional free accounts provide passwordless sign-in;
+learning progress remains browser-local. **All payment functionality has been
+removed** (November 2026): the site and backend cannot take money. The removed
+code is archived at git tag `payments-archive-2026-11`.
 
 ## Live
 
@@ -35,32 +34,30 @@ switch on later.
   schema v4). Progress stays on the device; the Worker supplies public access
   configuration and optional parent authentication.
 - Minimal backend: Cloudflare Worker + D1 (SQLite) — passwordless
-  magic-link auth, server-verified entitlement, Stripe Checkout + webhook
-  (the payment paths are dormant). Staging and production now use separate
+  magic-link auth only. There are no payment routes (`/checkout` and
+  `/stripe/webhook` return 404). Staging and production now use separate
   databases. Magic links are consumed atomically in D1, sessions are
   environment-bound, and KV is no longer used.
-- **Free-for-all gate:** `js/entitlement.js` `fullAccess()` =
-  `isPaid() || freeEra()` is the single check the UI gates on. `freeEra()`
-  (`js/config.js`) reads the Worker `/config` and **fails open** — a Worker
-  blip can never downgrade users to the restricted tier. Driven by
-  `FREE_ERA="true"` in `wrangler.toml`. `isPaid()` is kept narrower
-  ("this account paid") for the Account screen and post-era analytics.
-- Payments: Stripe (test mode), `PAYMENTS_ENABLED="false"`. We never see card
-  data. Secrets live only in the operator's macOS Keychain / `wrangler secret`.
+- **No gating:** the client has no paywall, plan list, checkout call or
+  daily cap; `js/entitlement.js` only caches the signed-in account for the
+  Account screen. The Worker's `/config` still returns `freeEra: true`
+  (hard-coded) so older cached clients stay unlocked; it no longer returns
+  `paymentsEnabled` or `plans`.
+- Payments: **none**. The `entitlements`, `stripe_events` and
+  `checkout_fulfillments` D1 tables are retained with their data (dropping
+  them is a separate decision). Secrets live only in the operator's macOS
+  Keychain / `wrangler secret`.
 - Transactional email: **Resend** (eu-west-1), verified domain
   `brightsparkprep.com` (DKIM/SPF/MX live), sender
   `Brightspark Prep <no-reply@brightsparkprep.com>`.
 
 ## Access model
 
-- **Free era (now):** all 4 subjects + mock exams + smart review + readiness
+- **Everything free:** all 4 subjects + mock exams + smart review + readiness
   analytics + worksheets, no daily cap — for everyone, no account, no payment.
-- **Accounts:** optional and free; magic-link sign-in; accounts identify parent access;
-  progress sync is not implemented.
-- **Restricted tier (dormant):** when `FREE_ERA` is flipped off (the future
-  monetisation launch), free reverts to Maths + a daily question cap and the
-  rest becomes paid. That gating copy/machinery is intact in the code but
-  currently unreachable.
+  This is the only access model; the restricted tier was removed.
+- **Accounts:** optional and free; magic-link sign-in; progress sync is not
+  implemented.
 
 ## Stage status
 
@@ -72,9 +69,10 @@ switch on later.
 | C1–C5 — D1/KV, Worker deploy, Stripe setup, frontend cutover, E2E test | ✅ (test-mode purchase E2E passed) |
 | Custom domain + Resend + rebrand (was "C6") | ✅ live |
 | **Free-for-all — open the gate** | ✅ **live** (PR #1 merged + deployed 2026-05-22) |
+| **Payments removed** (archived at tag `payments-archive-2026-11`) | ✅ in code; Worker redeploy pending |
 
-Current test state: existing client **430/430**, DOM/import security **30/30**,
-Worker **64/64** green. Both dependency audits report zero known vulnerabilities.
+Current test state: client **426/426**, DOM/import security + build **36/36**,
+Worker **59/59** green. Both dependency audits report zero known vulnerabilities.
 
 ## Free-for-all launch
 
@@ -90,26 +88,30 @@ optional, then monetise.
   cohort percentiles, e.g. "top 1%" by topic/subtopic) and **shelved**
   at the operator's call; not being built for now.
 
-## Pricing (dormant — for the eventual monetisation)
+## Payments removed (November 2026)
 
-Locked in Stripe (Price amounts are immutable); switched on only when the
-free era ends:
+All payment functionality was removed rather than feature-flagged, so it is
+structurally impossible to pay through the site or backend. The removed code
+(Worker checkout/webhook routes, Stripe signature verification, price mapping,
+client checkout and paywall UI, pricing copy) is archived at git tag
+**`payments-archive-2026-11`**.
 
-| Plan | Price (one-off, GBP) | Access | Seats |
-|---|---|---|---|
-| Annual | £29 | 12 months (365 d) | 1 |
-| 11+ Access | £34 | ~3 years (1095 d) | 1 |
-| Family | £49 | ~3 years (1095 d) | up to 3 |
+- Worker: `POST /checkout` and `POST /stripe/webhook` return 404. `/config`
+  has no `paymentsEnabled` or `plans`. `wrangler.toml` has no
+  `PAYMENTS_ENABLED`, `STRIPE_LIVE_MODE`, `PRICE_*`, `ACCESS_DAYS_*`,
+  `FAMILY_SEATS` or `FREE_ERA`, and `scripts/check-config.mjs` now rejects
+  any `STRIPE_*`, `PRICE_*` or `PAYMENTS_*` variable.
+- Data: no migration was added and no tables were dropped.
+- Manual follow-ups (not done in code): redeploy the Worker
+  (`npm run deploy:prod` from `worker/`); delete the `STRIPE_SECRET` /
+  `STRIPE_WEBHOOK_SECRET` Worker secrets and the Stripe webhook endpoints;
+  decide whether to keep or drop the retained payment tables.
 
 ## Current safety state
 
-- `PAYMENTS_ENABLED="false"` in `wrangler.toml` and live on the deployed
-  Worker (`/config` confirms). `/checkout` returns 403 — charging is
-  impossible until a deliberate launch flip.
-- `FREE_ERA="true"` in `wrangler.toml` and live on the deployed Worker —
-  `/config` returns `freeEra:true`. The static site is deployed and
-  free-for-all is **live**. To end the era later, flip `FREE_ERA` off
-  (Worker) **and** `FREE_ERA_DEFAULT` in `js/config.js`.
+- Until the Worker is redeployed, the live Worker still runs the old code
+  with `PAYMENTS_ENABLED="false"` (`/checkout` returns 403). After redeploy
+  the payment routes no longer exist.
 
 ## Free-for-all — deployed
 
@@ -124,19 +126,18 @@ Still recommended:
 - [ ] (Recommended) brief UK consumer-lawyer sense-check of
       `privacy.html` / `terms.html`.
 
-## Deferred / future monetisation
+## Deferred / future
 
-- **Ending the free era:** flip `FREE_ERA="false"` (Worker) **and**
-  `FREE_ERA_DEFAULT=false` (`js/config.js`), then the original payment-launch
-  checklist — ICO registration, Stripe account activation, Stripe Tax,
-  test→live Stripe key swap, flip `PAYMENTS_ENABLED="true"`.
+- Payments are removed. Restoring them would start from the
+  `payments-archive-2026-11` tag and need fresh legal copy and review.
 - Progress cloud-sync, benchmarking/cohorts, AI essay marking, age-range
   expansion (KS2 SATs / 7+–8+ / 13+ — the long-term LTV play in `ECONOMICS.md`).
 
 ## Operational notes
 
 - Secrets in macOS Keychain (`security find-generic-password -s <NAME> -w`):
-  `CLOUDFLARE_API_TOKEN`, `STRIPE_TEST_KEY`, `STRIPE_WHSEC`. Never in
+  `CLOUDFLARE_API_TOKEN` (the old `STRIPE_TEST_KEY` / `STRIPE_WHSEC` entries
+  are no longer used by the code and can be deleted). Never in
   repo/chat/`wrangler.toml`. Resend API key is in `wrangler secret` only
   (`EMAIL_API_KEY` on env.production).
 - Commits: author `kherhim` (NOT the work email). Outward-facing actions
@@ -149,6 +150,9 @@ Still recommended:
   SPF TXT + MX at `send`) are TXT/MX (no proxy concept).
 
 ## September 2026 security rollout
+
+_Historical record; the payment items below predate the November 2026
+removal._
 
 PR #2 carries fixes for HTML injection/import validation, environment
 isolation, single-use expiring links, mail abuse limits, development dependency

@@ -2,7 +2,7 @@
   "name": "brightspark-worker",
   "private": true,
   "type": "module",
-  "description": "Brightspark 11+ monetisation backend — magic-link auth, entitlement and Stripe. Separate dev-only sub-project; the static site stays zero-build and does not depend on this at build time.",
+  "description": "Brightspark 11+ backend — optional magic-link accounts. Takes no payments (payment code archived at git tag payments-archive-2026-11). Separate dev-only sub-project; the static site stays zero-build and does not depend on this at build time.",
   "scripts": {
     "dev": "wrangler dev",
     "deploy:staging": "node scripts/check-config.mjs staging && wrangler deploy --env staging",

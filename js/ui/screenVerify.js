@@ -1,6 +1,6 @@
 import { h, button, clear } from "./components.js";
 import { verifyToken } from "../auth.js";
-import { refreshEntitlement } from "../entitlement.js";
+import { refreshAccount } from "../entitlement.js";
 
 // Lands here from the emailed magic link: app.html#/verify/<token>.
 export function renderVerify(ctx, params) {
@@ -19,8 +19,8 @@ export function renderVerify(ctx, params) {
     if (!token) return fail(ctx);
     const res = await verifyToken(token);
     if (!res.ok) return fail(ctx);
-    await refreshEntitlement();
-    ctx.navigate("account"); // account screen continues any pending plan
+    await refreshAccount();
+    ctx.navigate("account");
   })();
 }
 
